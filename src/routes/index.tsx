@@ -1,23 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { listPublicProperties, getHomeStats } from "@/lib/properties.functions";
+import { listPublicProperties, getHomeStats, listLatestProjects, listBestSellingProjects } from "@/lib/properties.functions";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { PropertyCard } from "@/components/site/property-card";
 import { Button } from "@/components/ui/button";
-import { Building2, MapPin, HandshakeIcon, Eye, Target, Shield, MessageCircle } from "lucide-react";
-import { buildWhatsAppUrl, COMPANY_WHATSAPP, formatNumber } from "@/lib/format";
+import { Badge } from "@/components/ui/badge";
+import { Building2, MapPin, HandshakeIcon, Eye, Target, Shield, MessageCircle, CheckCircle2 } from "lucide-react";
+import { buildWhatsAppUrl, COMPANY_WHATSAPP, formatNumber, formatSAR } from "@/lib/format";
 
 const featuredQO = queryOptions({
   queryKey: ["home-featured"],
   queryFn: () => listPublicProperties({ data: { featuredOnly: true, pageSize: 6, sort: "newest", page: 1 } }),
 });
 const statsQO = queryOptions({ queryKey: ["home-stats"], queryFn: () => getHomeStats() });
+const latestQO = queryOptions({ queryKey: ["home-latest"], queryFn: () => listLatestProjects() });
+const bestSellingQO = queryOptions({ queryKey: ["home-best-selling"], queryFn: () => listBestSellingProjects() });
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(featuredQO);
     context.queryClient.ensureQueryData(statsQO);
+    context.queryClient.ensureQueryData(latestQO);
+    context.queryClient.ensureQueryData(bestSellingQO);
   },
   component: Home,
 });
@@ -25,6 +30,8 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { data: featured } = useSuspenseQuery(featuredQO);
   const { data: stats } = useSuspenseQuery(statsQO);
+  const { data: latest } = useSuspenseQuery(latestQO);
+  const { data: bestSelling } = useSuspenseQuery(bestSellingQO);
 
   const statItems = [
     { icon: Building2, label: "عقار متاح", value: stats.totalProperties },
@@ -81,8 +88,8 @@ function Home() {
       <section className="container mx-auto max-w-7xl px-4 py-16">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold">عقارات مميزة</h2>
-            <p className="text-muted-foreground mt-1">اختيارات منتقاة لأفضل العقارات المتاحة</p>
+            <h2 className="text-3xl font-bold">مشاريع مميزة</h2>
+            <p className="text-muted-foreground mt-1">اختيارات منتقاة لأبرز مشاريعنا المتاحة</p>
           </div>
           <Link to="/properties" className="text-sm font-medium text-accent-dark hover:text-primary">عرض الكل ←</Link>
         </div>
@@ -90,6 +97,97 @@ function Home() {
           {featured.rows.map((p) => <PropertyCard key={p.id} p={p as never} />)}
         </div>
       </section>
+
+      {/* LATEST PROJECTS */}
+      {latest.length > 0 && (
+        <section className="bg-primary-tint py-16">
+          <div className="container mx-auto max-w-7xl px-4">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold">أحدث المشاريع</h2>
+                <p className="text-muted-foreground mt-1">مشاريع متاحة أضيفت حديثاً</p>
+              </div>
+              <Link to="/properties" className="text-sm font-medium text-accent-dark hover:text-primary">
+                جميع المشاريع ←
+              </Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latest.map((p) => <PropertyCard key={p.id} p={p as never} />)}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* BEST SELLING */}
+      {bestSelling.length > 0 && (
+        <section className="container mx-auto max-w-7xl px-4 py-16">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold">المشاريع الأكثر مبيعاً</h2>
+              <p className="text-muted-foreground mt-1">المشاريع الأعلى نسبة مبيعات لدينا</p>
+            </div>
+            <Link to="/properties" className="text-sm font-medium text-accent-dark hover:text-primary">
+              عرض الكل ←
+            </Link>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {bestSelling.map((p) => (
+              <Link
+                key={p.id}
+                to="/properties/$id"
+                params={{ id: p.id }}
+                className="card-elegant overflow-hidden block group"
+              >
+                <div className="relative aspect-4/3 overflow-hidden bg-muted">
+                  {(() => {
+                    const imgs = (p.property_images ?? []).slice().sort((a, b) => Number(b.is_primary) - Number(a.is_primary));
+                    const cover = imgs[0]?.image_url ?? "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1200";
+                    return (
+                      <img
+                        src={cover}
+                        alt={p.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    );
+                  })()}
+                  <div className="absolute top-3 right-3 flex gap-2">
+                    {p.sold_percentage != null && (
+                      <Badge className="bg-primary text-primary-foreground">
+                        {p.sold_percentage}% مباع
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="p-4 space-y-3">
+                  <h3 className="font-bold text-base line-clamp-1 group-hover:text-primary transition-colors">{p.title}</h3>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <MapPin className="h-3 w-3" /> {p.city}{p.district ? ` · ${p.district}` : ""}
+                  </p>
+                  {p.sold_percentage != null && (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>نسبة المبيعات</span>
+                        <span className="font-semibold text-primary">{p.sold_percentage}%</span>
+                      </div>
+                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-linear-to-l from-accent to-accent-dark transition-all"
+                          style={{ width: `${p.sold_percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-1 border-t border-border">
+                    <span className="text-lg font-bold text-primary tabular">{formatSAR(p.price)}</span>
+                    <span className="text-xs text-accent-dark font-medium">شاهد التفاصيل ←</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* WHY US */}
       <section className="bg-primary-tint py-16">
@@ -113,6 +211,30 @@ function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* STATISTICS */}
+      <section className="container mx-auto max-w-7xl px-4 py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold">الإحصائيات</h2>
+          <p className="text-muted-foreground mt-2">أرقام تعكس ثقة عملائنا وحجم تجربتنا</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            { icon: Building2, value: formatNumber(stats.totalProperties), label: "إجمالي العقارات" },
+            { icon: CheckCircle2, value: formatNumber(stats.availableProjects), label: "مشروع متاح" },
+            { icon: HandshakeIcon, value: formatNumber(stats.completedDeals), label: "صفقة منجزة" },
+            { icon: Eye, value: formatNumber(stats.happyClients), label: "عميل سعيد" },
+          ].map((s) => (
+            <div key={s.label} className="card-elegant p-8 text-center">
+              <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-linear-to-br from-accent/20 to-accent/40 text-accent-dark mb-4">
+                <s.icon className="h-6 w-6" />
+              </div>
+              <div className="text-4xl font-bold text-primary tabular mb-1">{s.value}</div>
+              <div className="text-sm text-muted-foreground">{s.label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
