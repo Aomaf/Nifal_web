@@ -67,17 +67,46 @@ export const getPublicProperty = createServerFn({ method: "GET" })
 
 export const getHomeStats = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const [{ count: totalProps }, { data: cities }] = await Promise.all([
+  const [{ count: totalProps }, { data: cities }, { count: availableCount }] = await Promise.all([
     supabaseAdmin.from("properties").select("id", { count: "exact", head: true }).eq("is_published", true),
     supabaseAdmin.from("properties").select("city").eq("is_published", true),
+    supabaseAdmin.from("properties").select("id", { count: "exact", head: true }).eq("is_published", true).eq("status", "available"),
   ]);
   const uniqueCities = new Set((cities ?? []).map((c) => c.city)).size;
   return {
     totalProperties: totalProps ?? 0,
     citiesServed: uniqueCities,
+    availableProjects: availableCount ?? 0,
     completedDeals: 124,
     happyClients: 380,
   };
+});
+
+export const listLatestProjects = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("properties")
+    .select("id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,sold_percentage,views_count,created_at,property_images(image_url,is_primary,sort_order)")
+    .eq("is_published", true)
+    .eq("status", "available")
+    .order("created_at", { ascending: false })
+    .limit(6);
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
+export const listBestSellingProjects = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("properties")
+    .select("id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,sold_percentage,views_count,created_at,property_images(image_url,is_primary,sort_order)")
+    .eq("is_published", true)
+    .not("sold_percentage", "is", null)
+    .gt("sold_percentage", 0)
+    .order("sold_percentage", { ascending: false })
+    .limit(6);
+  if (error) throw new Error(error.message);
+  return data ?? [];
 });
 
 // ============== ADMIN ==============
@@ -109,6 +138,11 @@ const PropertyInput = z.object({
   is_featured: z.boolean().default(false),
   is_published: z.boolean().default(false),
   rega_ad_code: z.string().max(50).optional().nullable(),
+  sold_percentage: z.number().min(0).max(100).optional().nullable(),
+  handover_date: z.string().optional().nullable(),
+  hero_video_url: z.string().url().optional().nullable(),
+  tags: z.array(z.string()).default([]),
+  is_archived: z.boolean().default(false),
 });
 
 export const upsertProperty = createServerFn({ method: "POST" })
