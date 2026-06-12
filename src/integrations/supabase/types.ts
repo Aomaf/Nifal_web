@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      clients: {
+        Row: {
+          id: string
+          name: string
+          type: "individual" | "company" | "foundation" | "group"
+          phone: string
+          email: string | null
+          city: string | null
+          stage: "lead" | "prospect" | "active" | "negotiation" | "closed" | "lost"
+          source: string | null
+          interest_type: string | null
+          budget: number | null
+          rating: number | null
+          assigned_to: string | null
+          next_followup_at: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          type?: "individual" | "company" | "foundation" | "group"
+          phone: string
+          email?: string | null
+          city?: string | null
+          stage?: "lead" | "prospect" | "active" | "negotiation" | "closed" | "lost"
+          source?: string | null
+          interest_type?: string | null
+          budget?: number | null
+          rating?: number | null
+          assigned_to?: string | null
+          next_followup_at?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          type?: "individual" | "company" | "foundation" | "group"
+          phone?: string
+          email?: string | null
+          city?: string | null
+          stage?: "lead" | "prospect" | "active" | "negotiation" | "closed" | "lost"
+          source?: string | null
+          interest_type?: string | null
+          budget?: number | null
+          rating?: number | null
+          assigned_to?: string | null
+          next_followup_at?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       owners: {
         Row: {
           created_at: string
@@ -43,6 +100,51 @@ export type Database = {
           national_id?: string | null
           notes?: string | null
           phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          id: string
+          name: string
+          phone: string | null
+          email: string | null
+          property_id: string | null
+          notes: string | null
+          status: "new" | "contacted" | "qualified" | "converted" | "lost"
+          assigned_to: string | null
+          converted_client_id: string | null
+          source: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          phone?: string | null
+          email?: string | null
+          property_id?: string | null
+          notes?: string | null
+          status?: "new" | "contacted" | "qualified" | "converted" | "lost"
+          assigned_to?: string | null
+          converted_client_id?: string | null
+          source?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          phone?: string | null
+          email?: string | null
+          property_id?: string | null
+          notes?: string | null
+          status?: "new" | "contacted" | "qualified" | "converted" | "lost"
+          assigned_to?: string | null
+          converted_client_id?: string | null
+          source?: string | null
+          created_at?: string
           updated_at?: string
         }
         Relationships: []
@@ -92,7 +194,10 @@ export type Database = {
           created_at: string
           description: string | null
           district: string | null
+          handover_date: string | null
+          hero_video_url: string | null
           id: string
+          is_archived: boolean
           is_featured: boolean
           is_published: boolean
           leads_count: number
@@ -103,7 +208,9 @@ export type Database = {
           price: number
           purpose: Database["public"]["Enums"]["property_purpose"]
           rega_ad_code: string | null
+          sold_percentage: number | null
           status: Database["public"]["Enums"]["property_status"]
+          tags: string[]
           title: string
           type: Database["public"]["Enums"]["property_type"]
           updated_at: string
@@ -117,7 +224,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           district?: string | null
+          handover_date?: string | null
+          hero_video_url?: string | null
           id?: string
+          is_archived?: boolean
           is_featured?: boolean
           is_published?: boolean
           leads_count?: number
@@ -128,7 +238,9 @@ export type Database = {
           price?: number
           purpose: Database["public"]["Enums"]["property_purpose"]
           rega_ad_code?: string | null
+          sold_percentage?: number | null
           status?: Database["public"]["Enums"]["property_status"]
+          tags?: string[]
           title: string
           type: Database["public"]["Enums"]["property_type"]
           updated_at?: string
@@ -142,7 +254,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           district?: string | null
+          handover_date?: string | null
+          hero_video_url?: string | null
           id?: string
+          is_archived?: boolean
           is_featured?: boolean
           is_published?: boolean
           leads_count?: number
@@ -153,7 +268,9 @@ export type Database = {
           price?: number
           purpose?: Database["public"]["Enums"]["property_purpose"]
           rega_ad_code?: string | null
+          sold_percentage?: number | null
           status?: Database["public"]["Enums"]["property_status"]
+          tags?: string[]
           title?: string
           type?: Database["public"]["Enums"]["property_type"]
           updated_at?: string
@@ -254,6 +371,126 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      rental_contracts: {
+        Row: {
+          id: string
+          unit_id: string
+          tenant_id: string
+          start_date: string
+          end_date: string
+          rent_amount: number
+          payment_frequency: "monthly" | "quarterly" | "biannual" | "annual"
+          deposit_amount: number | null
+          status: "draft" | "active" | "expired" | "cancelled"
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          unit_id: string
+          tenant_id: string
+          start_date: string
+          end_date: string
+          rent_amount: number
+          payment_frequency?: "monthly" | "quarterly" | "biannual" | "annual"
+          deposit_amount?: number | null
+          status?: "draft" | "active" | "expired" | "cancelled"
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          unit_id?: string
+          tenant_id?: string
+          start_date?: string
+          end_date?: string
+          rent_amount?: number
+          payment_frequency?: "monthly" | "quarterly" | "biannual" | "annual"
+          deposit_amount?: number | null
+          status?: "draft" | "active" | "expired" | "cancelled"
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tenants: {
+        Row: {
+          id: string
+          name: string
+          phone: string
+          email: string | null
+          national_id: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          phone: string
+          email?: string | null
+          national_id?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          phone?: string
+          email?: string | null
+          national_id?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      units: {
+        Row: {
+          id: string
+          property_id: string
+          unit_number: string
+          floor: number | null
+          area_sqm: number | null
+          bedrooms: number | null
+          bathrooms: number | null
+          status: "vacant" | "rented" | "under_maintenance"
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          unit_number: string
+          floor?: number | null
+          area_sqm?: number | null
+          bedrooms?: number | null
+          bathrooms?: number | null
+          status?: "vacant" | "rented" | "under_maintenance"
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          unit_number?: string
+          floor?: number | null
+          area_sqm?: number | null
+          bedrooms?: number | null
+          bathrooms?: number | null
+          status?: "vacant" | "rented" | "under_maintenance"
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
         }
         Relationships: []
       }
