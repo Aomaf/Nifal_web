@@ -25,15 +25,25 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
 
-  const loginForm = useForm({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } });
-  const signupForm = useForm({ resolver: zodResolver(signupSchema), defaultValues: { email: "", password: "", full_name: "" } });
+  const loginForm = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
+  const signupForm = useForm({
+    resolver: zodResolver(signupSchema),
+    defaultValues: { email: "", password: "", full_name: "" },
+  });
 
   const onLogin = async (data: z.infer<typeof loginSchema>) => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword(data);
+    const { error, data: authData } = await supabase.auth.signInWithPassword(data);
     setLoading(false);
     if (error) return toast.error("فشل تسجيل الدخول: " + error.message);
+    if (!authData.session) return toast.error("فشل تسجيل الدخول: لم يتم إنشاء جلسة");
     toast.success("تم تسجيل الدخول");
     navigate({ to: "/admin" });
   };
@@ -45,7 +55,8 @@ function LoginPage() {
       password: data.password,
       options: {
         data: { full_name: data.full_name },
-        emailRedirectTo: typeof window !== "undefined" ? window.location.origin + "/admin" : undefined,
+        emailRedirectTo:
+          typeof window !== "undefined" ? window.location.origin + "/admin" : undefined,
       },
     });
     setLoading(false);
@@ -57,10 +68,9 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="absolute inset-0 surface-hero opacity-95" />
       <div className="relative w-full max-w-md">
-        <div className="text-center mb-6 [&_*]:text-primary-foreground">
-          <NafalLogo className="h-14 w-auto mx-auto" showText={false} />
-          <h1 className="mt-3 text-2xl font-bold">نِفال العقارية</h1>
-          <p className="text-sm opacity-80">لوحة الإدارة</p>
+        <div className="text-center mb-6">
+          <NafalLogo className="h-16 w-auto mx-auto brightness-0 invert" />
+          <p className="text-sm text-primary-foreground/80 mt-2">لوحة الإدارة</p>
         </div>
         <div className="card-elegant p-6 bg-surface">
           <Tabs defaultValue="login">
@@ -73,16 +83,81 @@ function LoginPage() {
                 <div>
                   <Label>البريد الإلكتروني</Label>
                   <Input type="email" dir="ltr" {...loginForm.register("email")} />
-                  {loginForm.formState.errors.email && <p className="text-xs text-destructive mt-1">{loginForm.formState.errors.email.message}</p>}
+                  {loginForm.formState.errors.email && (
+                    <p className="text-xs text-destructive mt-1">
+                      {loginForm.formState.errors.email.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label>كلمة المرور</Label>
                   <Input type="password" dir="ltr" {...loginForm.register("password")} />
-                  {loginForm.formState.errors.password && <p className="text-xs text-destructive mt-1">{loginForm.formState.errors.password.message}</p>}
+                  {loginForm.formState.errors.password && (
+                    <p className="text-xs text-destructive mt-1">
+                      {loginForm.formState.errors.password.message}
+                    </p>
+                  )}
                 </div>
                 <Button type="submit" className="w-full btn-hero h-11" disabled={loading}>
                   {loading ? "جاري الدخول..." : "تسجيل الدخول"}
                 </Button>
+                <button
+                  type="button"
+                  className="w-full text-xs text-muted-foreground hover:text-foreground text-center mt-1"
+                  onClick={() => setForgotOpen((v) => !v)}
+                >
+                  نسيت كلمة المرور؟
+                </button>
+                {forgotOpen && (
+                  <div className="mt-2 space-y-2 rounded-lg bg-muted/50 p-3">
+                    {forgotSent ? (
+                      <p className="text-xs text-green-700">
+                        تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-xs text-muted-foreground">
+                          أدخل بريدك لإرسال رابط إعادة تعيين كلمة المرور
+                        </p>
+                        <Input
+                          type="email"
+                          dir="ltr"
+                          placeholder="your@email.com"
+                          value={forgotEmail}
+                          onChange={(e) => setForgotEmail(e.target.value)}
+                          className="h-8 text-sm"
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="w-full"
+                          disabled={loading}
+                          onClick={async () => {
+                            if (!forgotEmail) return;
+                            setLoading(true);
+                            const { error } = await supabase.auth.resetPasswordForEmail(
+                              forgotEmail,
+                              {
+                                redirectTo:
+                                  typeof window !== "undefined"
+                                    ? window.location.origin + "/reset-password"
+                                    : undefined,
+                              },
+                            );
+                            setLoading(false);
+                            if (error) {
+                              toast.error(error.message);
+                            } else {
+                              setForgotSent(true);
+                            }
+                          }}
+                        >
+                          {loading ? "..." : "إرسال الرابط"}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                )}
               </form>
             </TabsContent>
             <TabsContent value="signup" className="space-y-4 mt-4">
@@ -90,12 +165,20 @@ function LoginPage() {
                 <div>
                   <Label>الاسم الكامل</Label>
                   <Input {...signupForm.register("full_name")} />
-                  {signupForm.formState.errors.full_name && <p className="text-xs text-destructive mt-1">{signupForm.formState.errors.full_name.message}</p>}
+                  {signupForm.formState.errors.full_name && (
+                    <p className="text-xs text-destructive mt-1">
+                      {signupForm.formState.errors.full_name.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label>البريد الإلكتروني</Label>
                   <Input type="email" dir="ltr" {...signupForm.register("email")} />
-                  {signupForm.formState.errors.email && <p className="text-xs text-destructive mt-1">{signupForm.formState.errors.email.message}</p>}
+                  {signupForm.formState.errors.email && (
+                    <p className="text-xs text-destructive mt-1">
+                      {signupForm.formState.errors.email.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label>كلمة المرور</Label>
@@ -112,7 +195,9 @@ function LoginPage() {
           </p>
         </div>
         <p className="text-center mt-4 text-sm text-primary-foreground/80">
-          <a href="/" className="hover:text-accent">← العودة للموقع</a>
+          <a href="/" className="hover:text-accent">
+            ← العودة للموقع
+          </a>
         </p>
       </div>
     </div>

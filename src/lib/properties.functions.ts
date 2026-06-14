@@ -22,7 +22,10 @@ export const listPublicProperties = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("properties")
-      .select("id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,views_count,created_at, property_images(image_url,is_primary,sort_order)", { count: "exact" })
+      .select(
+        "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,views_count,created_at, property_images(image_url,is_primary,sort_order)",
+        { count: "exact" },
+      )
       .eq("is_published", true);
 
     if (data.featuredOnly) q = q.eq("is_featured", true);
@@ -35,10 +38,17 @@ export const listPublicProperties = createServerFn({ method: "GET" })
     if (data.search) q = q.ilike("title", `%${data.search}%`);
 
     switch (data.sort) {
-      case "price_asc": q = q.order("price", { ascending: true }); break;
-      case "price_desc": q = q.order("price", { ascending: false }); break;
-      case "most_viewed": q = q.order("views_count", { ascending: false }); break;
-      default: q = q.order("is_featured", { ascending: false }).order("created_at", { ascending: false });
+      case "price_asc":
+        q = q.order("price", { ascending: true });
+        break;
+      case "price_desc":
+        q = q.order("price", { ascending: false });
+        break;
+      case "most_viewed":
+        q = q.order("views_count", { ascending: false });
+        break;
+      default:
+        q = q.order("is_featured", { ascending: false }).order("created_at", { ascending: false });
     }
 
     const from = (data.page - 1) * data.pageSize;
@@ -46,6 +56,24 @@ export const listPublicProperties = createServerFn({ method: "GET" })
     const { data: rows, count, error } = await q.range(from, to);
     if (error) throw new Error(error.message);
     return { rows: rows ?? [], total: count ?? 0, page: data.page, pageSize: data.pageSize };
+  });
+
+export const getPropertyByRegaCode = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) =>
+    z.object({ rega_ad_code: z.string().min(1).max(50) }).parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: property, error } = await supabaseAdmin
+      .from("properties")
+      .select(
+        "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,rega_ad_code,property_images(image_url,is_primary,sort_order)",
+      )
+      .eq("rega_ad_code", data.rega_ad_code)
+      .eq("is_published", true)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return property ?? null;
   });
 
 export const getPublicProperty = createServerFn({ method: "GET" })
@@ -61,16 +89,26 @@ export const getPublicProperty = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!property) return null;
     // increment views (fire and forget)
-    await supabaseAdmin.from("properties").update({ views_count: (property.views_count ?? 0) + 1 }).eq("id", data.id);
+    await supabaseAdmin
+      .from("properties")
+      .update({ views_count: (property.views_count ?? 0) + 1 })
+      .eq("id", data.id);
     return property;
   });
 
 export const getHomeStats = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const [{ count: totalProps }, { data: cities }, { count: availableCount }] = await Promise.all([
-    supabaseAdmin.from("properties").select("id", { count: "exact", head: true }).eq("is_published", true),
+    supabaseAdmin
+      .from("properties")
+      .select("id", { count: "exact", head: true })
+      .eq("is_published", true),
     supabaseAdmin.from("properties").select("city").eq("is_published", true),
-    supabaseAdmin.from("properties").select("id", { count: "exact", head: true }).eq("is_published", true).eq("status", "available"),
+    supabaseAdmin
+      .from("properties")
+      .select("id", { count: "exact", head: true })
+      .eq("is_published", true)
+      .eq("status", "available"),
   ]);
   const uniqueCities = new Set((cities ?? []).map((c) => c.city)).size;
   return {
@@ -86,7 +124,9 @@ export const listLatestProjects = createServerFn({ method: "GET" }).handler(asyn
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("properties")
-    .select("id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,sold_percentage,views_count,created_at,property_images(image_url,is_primary,sort_order)")
+    .select(
+      "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,sold_percentage,views_count,created_at,property_images(image_url,is_primary,sort_order)",
+    )
     .eq("is_published", true)
     .eq("status", "available")
     .order("created_at", { ascending: false })
@@ -99,7 +139,9 @@ export const listBestSellingProjects = createServerFn({ method: "GET" }).handler
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("properties")
-    .select("id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,sold_percentage,views_count,created_at,property_images(image_url,is_primary,sort_order)")
+    .select(
+      "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,sold_percentage,views_count,created_at,property_images(image_url,is_primary,sort_order)",
+    )
     .eq("is_published", true)
     .not("sold_percentage", "is", null)
     .gt("sold_percentage", 0)
@@ -113,13 +155,48 @@ export const listBestSellingProjects = createServerFn({ method: "GET" }).handler
 
 export const listAdminProperties = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        page: z.number().int().min(1).default(1),
+        pageSize: z.number().int().min(1).max(100).default(20),
+        search: z.string().optional(),
+        status: z.string().optional(),
+      })
+      .parse(data ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    let q = context.supabase
       .from("properties")
-      .select("*, property_images(image_url,is_primary,sort_order)")
+      .select("*, property_images(image_url,is_primary,sort_order)", { count: "exact" })
       .order("created_at", { ascending: false });
+
+    if (data.search) q = q.ilike("title", `%${data.search}%`);
+    if (data.status) q = q.eq("status", data.status as never);
+
+    const from = (data.page - 1) * data.pageSize;
+    const to = from + data.pageSize - 1;
+    const { data: rows, count, error } = await q.range(from, to);
     if (error) throw new Error(error.message);
-    return data ?? [];
+    return { rows: rows ?? [], total: count ?? 0, page: data.page, pageSize: data.pageSize };
+  });
+
+export const exportAdminPropertiesCSV = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).optional() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    let q = context.supabase
+      .from("properties")
+      .select(
+        "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_published,is_featured,views_count,rega_ad_code,created_at",
+      )
+      .order("created_at", { ascending: false });
+    if (data.ids?.length) q = q.in("id", data.ids);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return rows ?? [];
   });
 
 const PropertyInput = z.object({
@@ -128,19 +205,29 @@ const PropertyInput = z.object({
   description: z.string().max(5000).optional().nullable(),
   city: z.string().min(1).max(100),
   district: z.string().max(100).optional().nullable(),
-  type: z.enum(["villa","apartment","office","shop","industrial","residential_land","commercial_land","industrial_land","building"]),
-  purpose: z.enum(["sale","rent"]),
+  type: z.enum([
+    "villa",
+    "apartment",
+    "office",
+    "shop",
+    "industrial",
+    "residential_land",
+    "commercial_land",
+    "industrial_land",
+    "building",
+  ]),
+  purpose: z.enum(["sale", "rent"]),
   price: z.number().nonnegative(),
   area_sqm: z.number().nonnegative().optional().nullable(),
   bedrooms: z.number().int().nonnegative().optional().nullable(),
   bathrooms: z.number().int().nonnegative().optional().nullable(),
-  status: z.enum(["available","sold","rented","reserved"]).default("available"),
+  status: z.enum(["available", "sold", "rented", "reserved"]).default("available"),
   is_featured: z.boolean().default(false),
   is_published: z.boolean().default(false),
   rega_ad_code: z.string().max(50).optional().nullable(),
   sold_percentage: z.number().min(0).max(100).optional().nullable(),
   handover_date: z.string().optional().nullable(),
-  hero_video_url: z.string().url().optional().nullable(),
+  hero_video_url: z.string().url().optional().or(z.literal("")).nullable(),
   tags: z.array(z.string()).default([]),
   is_archived: z.boolean().default(false),
 });
@@ -169,15 +256,19 @@ export const deleteProperty = createServerFn({ method: "POST" })
 
 export const togglePropertyFlag = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({
-    id: z.string().uuid(),
-    field: z.enum(["is_published","is_featured"]),
-    value: z.boolean(),
-  }).parse(data))
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        field: z.enum(["is_published", "is_featured"]),
+        value: z.boolean(),
+      })
+      .parse(data),
+  )
   .handler(async ({ data, context }) => {
-    const update = (data.field === "is_published"
-      ? { is_published: data.value }
-      : { is_featured: data.value }) as never;
+    const update = (
+      data.field === "is_published" ? { is_published: data.value } : { is_featured: data.value }
+    ) as never;
     const { error } = await context.supabase.from("properties").update(update).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };

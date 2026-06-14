@@ -5,9 +5,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import {
-  listAdminContracts, upsertContract, deleteContract,
-  listAdminUnits, upsertUnit, deleteUnit,
-  listAdminTenants, upsertTenant, deleteTenant,
+  listAdminContracts,
+  upsertContract,
+  deleteContract,
+  listAdminUnits,
+  upsertUnit,
+  deleteUnit,
+  listAdminTenants,
+  upsertTenant,
+  deleteTenant,
 } from "@/lib/rentals.functions";
 import { PageHeader } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
@@ -41,7 +47,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, Phone, MessageCircle, Key, Home, Users } from "lucide-react";
-import { buildWhatsAppUrl, formatSAR } from "@/lib/format";
+import { buildWhatsAppUrl } from "@/lib/format";
+import { SarAmount } from "@/components/ui/sar-icon";
 
 export const Route = createFileRoute("/_authenticated/admin/rentals")({
   component: RentalsPage,
@@ -138,9 +145,15 @@ function RentalsPage() {
             <TabsTrigger value="units">الوحدات</TabsTrigger>
             <TabsTrigger value="tenants">المستأجرون</TabsTrigger>
           </TabsList>
-          <TabsContent value="contracts"><ContractsTab /></TabsContent>
-          <TabsContent value="units"><UnitsTab /></TabsContent>
-          <TabsContent value="tenants"><TenantsTab /></TabsContent>
+          <TabsContent value="contracts">
+            <ContractsTab />
+          </TabsContent>
+          <TabsContent value="units">
+            <UnitsTab />
+          </TabsContent>
+          <TabsContent value="tenants">
+            <TenantsTab />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
@@ -155,10 +168,28 @@ function ContractsTab() {
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [contractFilter, setContractFilter] = useState("all");
 
   const { data: contracts = [], isLoading } = useQuery({
     queryKey: ["admin-contracts"],
     queryFn: () => listAdminContracts(),
+  });
+
+  // Annual income KPI
+  const annualIncome = contracts
+    .filter((c) => c.status === "active")
+    .reduce((s, c) => {
+      const mult: Record<string, number> = { monthly: 12, quarterly: 4, biannual: 2, annual: 1 };
+      return s + c.rent_amount * (mult[c.payment_frequency] ?? 12);
+    }, 0);
+
+  const filteredContracts = contracts.filter((c) => {
+    if (contractFilter === "all") return true;
+    if (contractFilter === "expiring") {
+      const days = Math.ceil((new Date(c.end_date).getTime() - Date.now()) / 86400000);
+      return c.status === "active" && days <= 60 && days > 0;
+    }
+    return c.status === contractFilter;
   });
   const { data: units = [] } = useQuery({
     queryKey: ["admin-units"],
@@ -241,35 +272,63 @@ function ContractsTab() {
 
   return (
     <>
-      <div className="flex justify-end mb-4">
+      {/* Annual income KPI */}
+      {annualIncome > 0 && (
+        <div className="card-elegant p-4 mb-4 flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">إجمالي الدخل السنوي (العقود النشطة)</span>
+          <span className="text-xl font-bold text-primary"><SarAmount value={annualIncome} /></span>
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        {/* Filter tabs */}
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: "all", label: "الكل" },
+            { value: "active", label: "نشط" },
+            { value: "expiring", label: "ينتهي قريباً" },
+            { value: "expired", label: "منتهي" },
+            { value: "cancelled", label: "ملغي" },
+            { value: "draft", label: "مسودة" },
+          ].map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setContractFilter(f.value)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                contractFilter === f.value
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background border-border hover:border-primary/50"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
         <Button onClick={openCreate} className="btn-hero">
-          <Plus className="h-4 w-4 ms-2" />
-          إضافة عقد
+          <Plus className="h-4 w-4 ms-2" />إضافة عقد
         </Button>
       </div>
 
-      {isLoading && (
-        <div className="p-8 text-center text-muted-foreground">جاري التحميل…</div>
-      )}
+      {isLoading && <div className="p-8 text-center text-muted-foreground">جاري التحميل…</div>}
 
       {!isLoading && contracts.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <Key className="h-16 w-16 text-muted-foreground/40" />
           <p className="text-lg font-medium text-muted-foreground">لا توجد عقود</p>
           <Button onClick={openCreate} className="btn-hero">
-            <Plus className="h-4 w-4 ms-2" />
-            إضافة عقد
+            <Plus className="h-4 w-4 ms-2" />إضافة عقد
           </Button>
         </div>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {contracts.map((c) => {
-          const daysLeft = Math.ceil(
-            (new Date(c.end_date).getTime() - Date.now()) / 86400000
-          );
-          const unit = (c.unit as unknown) as { id: string; unit_number: string; property: { id: string; title: string; city: string } | null } | null;
-          const tenant = (c.tenant as unknown) as { id: string; name: string; phone: string } | null;
+        {filteredContracts.map((c) => {
+          const daysLeft = Math.ceil((new Date(c.end_date).getTime() - Date.now()) / 86400000);
+          const unit = c.unit as unknown as {
+            id: string;
+            unit_number: string;
+          } | null;
+          const tenant = c.tenant as unknown as { id: string; name: string; phone: string } | null;
           return (
             <div key={c.id} className="card-elegant p-5 space-y-3">
               <div className="flex items-start justify-between gap-2">
@@ -277,7 +336,6 @@ function ContractsTab() {
                   <h3 className="font-bold text-base truncate">{tenant?.name ?? "—"}</h3>
                   <p className="text-sm text-muted-foreground truncate">
                     {unit?.unit_number ?? "—"}
-                    {unit?.property ? ` · ${unit.property.title}` : ""}
                   </p>
                 </div>
                 <div className="flex gap-1 shrink-0">
@@ -288,7 +346,10 @@ function ContractsTab() {
                     size="icon"
                     variant="ghost"
                     className="text-destructive"
-                    onClick={() => { setDeleteId(c.id); setDeleteError(null); }}
+                    onClick={() => {
+                      setDeleteId(c.id);
+                      setDeleteError(null);
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -296,7 +357,9 @@ function ContractsTab() {
               </div>
 
               <div className="flex flex-wrap gap-2 text-xs">
-                <span className={`px-2 py-0.5 rounded-full font-medium ${CONTRACT_STATUS_COLORS[c.status] ?? "bg-gray-100 text-gray-700"}`}>
+                <span
+                  className={`px-2 py-0.5 rounded-full font-medium ${CONTRACT_STATUS_COLORS[c.status] ?? "bg-gray-100 text-gray-700"}`}
+                >
                   {CONTRACT_STATUS_LABELS[c.status] ?? c.status}
                 </span>
                 {c.status === "active" && daysLeft <= 30 && (
@@ -315,8 +378,10 @@ function ContractsTab() {
               </div>
 
               <div className="space-y-1 text-sm text-muted-foreground">
-                <p>{c.start_date} ← {c.end_date}</p>
-                <p className="font-semibold text-foreground">{formatSAR(c.rent_amount)}</p>
+                <p>
+                  {c.start_date} ← {c.end_date}
+                </p>
+                <p className="font-semibold text-foreground"><SarAmount value={c.rent_amount} /></p>
               </div>
             </div>
           );
@@ -327,9 +392,7 @@ function ContractsTab() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              {form.getValues("id") ? "تعديل عقد" : "إضافة عقد"}
-            </DialogTitle>
+            <DialogTitle>{form.getValues("id") ? "تعديل عقد" : "إضافة عقد"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="space-y-4">
             {/* Unit select */}
@@ -345,10 +408,15 @@ function ContractsTab() {
                     </SelectTrigger>
                     <SelectContent>
                       {units.map((u) => {
-                        const prop = (u.property as unknown) as { id: string; title: string; city: string } | null;
+                        const prop = u.property as unknown as {
+                          id: string;
+                          title: string;
+                          city: string;
+                        } | null;
                         return (
                           <SelectItem key={u.id} value={u.id}>
-                            {u.unit_number}{prop ? ` · ${prop.title}` : ""}
+                            {u.unit_number}
+                            {prop ? ` · ${prop.title}` : ""}
                           </SelectItem>
                         );
                       })}
@@ -383,7 +451,9 @@ function ContractsTab() {
                 )}
               />
               {form.formState.errors.tenant_id && (
-                <p className="text-xs text-destructive">{form.formState.errors.tenant_id.message}</p>
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.tenant_id.message}
+                </p>
               )}
             </div>
 
@@ -393,14 +463,18 @@ function ContractsTab() {
                 <Label>تاريخ البداية *</Label>
                 <Input type="date" {...form.register("start_date")} dir="ltr" />
                 {form.formState.errors.start_date && (
-                  <p className="text-xs text-destructive">{form.formState.errors.start_date.message}</p>
+                  <p className="text-xs text-destructive">
+                    {form.formState.errors.start_date.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-1">
                 <Label>تاريخ النهاية *</Label>
                 <Input type="date" {...form.register("end_date")} dir="ltr" />
                 {form.formState.errors.end_date && (
-                  <p className="text-xs text-destructive">{form.formState.errors.end_date.message}</p>
+                  <p className="text-xs text-destructive">
+                    {form.formState.errors.end_date.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -411,7 +485,9 @@ function ContractsTab() {
                 <Label>مبلغ الإيجار *</Label>
                 <Input type="number" {...form.register("rent_amount")} dir="ltr" />
                 {form.formState.errors.rent_amount && (
-                  <p className="text-xs text-destructive">{form.formState.errors.rent_amount.message}</p>
+                  <p className="text-xs text-destructive">
+                    {form.formState.errors.rent_amount.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-1">
@@ -484,7 +560,12 @@ function ContractsTab() {
       {/* Delete Dialog */}
       <AlertDialog
         open={!!deleteId}
-        onOpenChange={(o) => { if (!o) { setDeleteId(null); setDeleteError(null); } }}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDeleteId(null);
+            setDeleteError(null);
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -604,9 +685,7 @@ function UnitsTab() {
         </Button>
       </div>
 
-      {isLoading && (
-        <div className="p-8 text-center text-muted-foreground">جاري التحميل…</div>
-      )}
+      {isLoading && <div className="p-8 text-center text-muted-foreground">جاري التحميل…</div>}
 
       {!isLoading && units.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -621,7 +700,7 @@ function UnitsTab() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {units.map((u) => {
-          const prop = (u.property as unknown) as { id: string; title: string; city: string } | null;
+          const prop = u.property as unknown as { id: string; title: string; city: string } | null;
           return (
             <div key={u.id} className="card-elegant p-5 space-y-3">
               <div className="flex items-start justify-between gap-2">
@@ -641,7 +720,10 @@ function UnitsTab() {
                     size="icon"
                     variant="ghost"
                     className="text-destructive"
-                    onClick={() => { setDeleteId(u.id); setDeleteError(null); }}
+                    onClick={() => {
+                      setDeleteId(u.id);
+                      setDeleteError(null);
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -649,7 +731,9 @@ function UnitsTab() {
               </div>
 
               <div className="flex flex-wrap gap-2 text-xs">
-                <span className={`px-2 py-0.5 rounded-full font-medium ${UNIT_STATUS_COLORS[u.status] ?? "bg-gray-100 text-gray-700"}`}>
+                <span
+                  className={`px-2 py-0.5 rounded-full font-medium ${UNIT_STATUS_COLORS[u.status] ?? "bg-gray-100 text-gray-700"}`}
+                >
                   {UNIT_STATUS_LABELS[u.status] ?? u.status}
                 </span>
               </div>
@@ -668,23 +752,25 @@ function UnitsTab() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {form.getValues("id") ? "تعديل وحدة" : "إضافة وحدة"}
-            </DialogTitle>
+            <DialogTitle>{form.getValues("id") ? "تعديل وحدة" : "إضافة وحدة"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="space-y-4">
             <div className="space-y-1">
               <Label>معرّف العقار *</Label>
               <Input {...form.register("property_id")} dir="ltr" placeholder="UUID" />
               {form.formState.errors.property_id && (
-                <p className="text-xs text-destructive">{form.formState.errors.property_id.message}</p>
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.property_id.message}
+                </p>
               )}
             </div>
             <div className="space-y-1">
               <Label>رقم الوحدة *</Label>
               <Input {...form.register("unit_number")} />
               {form.formState.errors.unit_number && (
-                <p className="text-xs text-destructive">{form.formState.errors.unit_number.message}</p>
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.unit_number.message}
+                </p>
               )}
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -745,7 +831,12 @@ function UnitsTab() {
       {/* Delete Dialog */}
       <AlertDialog
         open={!!deleteId}
-        onOpenChange={(o) => { if (!o) { setDeleteId(null); setDeleteError(null); } }}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDeleteId(null);
+            setDeleteError(null);
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -844,9 +935,7 @@ function TenantsTab() {
         </Button>
       </div>
 
-      {isLoading && (
-        <div className="p-8 text-center text-muted-foreground">جاري التحميل…</div>
-      )}
+      {isLoading && <div className="p-8 text-center text-muted-foreground">جاري التحميل…</div>}
 
       {!isLoading && tenants.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -879,7 +968,10 @@ function TenantsTab() {
                   size="icon"
                   variant="ghost"
                   className="text-destructive"
-                  onClick={() => { setDeleteId(t.id); setDeleteError(null); }}
+                  onClick={() => {
+                    setDeleteId(t.id);
+                    setDeleteError(null);
+                  }}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -900,9 +992,7 @@ function TenantsTab() {
                   </a>
                 </div>
               )}
-              {t.email && (
-                <p className="truncate">{t.email}</p>
-              )}
+              {t.email && <p className="truncate">{t.email}</p>}
               {t.notes && (
                 <p className="text-xs line-clamp-2 pt-1 border-t border-border">{t.notes}</p>
               )}
@@ -915,9 +1005,7 @@ function TenantsTab() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {form.getValues("id") ? "تعديل مستأجر" : "إضافة مستأجر"}
-            </DialogTitle>
+            <DialogTitle>{form.getValues("id") ? "تعديل مستأجر" : "إضافة مستأجر"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit((v) => save.mutate(v))} className="space-y-4">
             <div className="space-y-1">
@@ -964,7 +1052,12 @@ function TenantsTab() {
       {/* Delete Dialog */}
       <AlertDialog
         open={!!deleteId}
-        onOpenChange={(o) => { if (!o) { setDeleteId(null); setDeleteError(null); } }}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDeleteId(null);
+            setDeleteError(null);
+          }
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

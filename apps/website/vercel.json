@@ -1,0 +1,6 @@
+{
+  "buildCommand": "bun run build:website",
+  "outputDirectory": "apps/website/.output",
+  "installCommand": "bun install",
+  "framework": null
+}

@@ -1,8 +1,8 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { NafalLogo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
-import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const links = [
   { to: "/", label: "الرئيسية" },
@@ -13,37 +13,127 @@ const links = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // Only homepage has a dark hero — all other pages use a solid header immediately
+  const isHomePage = pathname === "/";
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Transparent/white-text only on homepage before scroll
+  const dark = isHomePage && !scrolled;
+
   return (
-    <header className="sticky top-0 z-40 bg-surface/90 backdrop-blur border-b border-border">
-      <div className="container mx-auto max-w-7xl px-4 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center"><NafalLogo /></Link>
-        <nav className="hidden md:flex items-center gap-1">
+    <header
+      className={[
+        "fixed inset-x-0 top-0 z-40 transition-[background-color,border-color,box-shadow] duration-300",
+        dark
+          ? "border-b border-transparent bg-transparent"
+          : "border-b border-border bg-background/98 shadow-sm backdrop-blur-sm",
+      ].join(" ")}
+    >
+      <div className="container relative mx-auto flex h-16 max-w-7xl items-center justify-between px-6 md:px-8">
+
+        {/* Logo */}
+        <Link to="/" className="flex shrink-0 items-center">
+          <NafalLogo
+            className="h-9 w-auto transition-[filter] duration-300"
+            inverted={dark}
+          />
+        </Link>
+
+        {/* Desktop nav — centre */}
+        <nav className="hidden items-center gap-7 md:flex">
           {links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors rounded-md hover:bg-primary-tint"
-              activeProps={{ className: "text-primary bg-primary-tint" }}
+              className={[
+                "text-[13px] font-normal tracking-wide transition-colors",
+                dark ? "text-white/70 hover:text-white" : "text-foreground/65 hover:text-foreground",
+              ].join(" ")}
+              activeProps={{
+                className: dark ? "!text-white font-medium" : "!text-primary font-medium",
+              }}
               activeOptions={{ exact: l.to === "/" }}
             >
               {l.label}
             </Link>
           ))}
         </nav>
-        <div className="hidden md:flex items-center gap-2">
-          <Link to="/login"><Button variant="outline" size="sm">دخول الإدارة</Button></Link>
+
+        {/* Desktop CTA */}
+        <div className="hidden items-center md:flex">
+          <Link to="/login">
+            <Button
+              variant="outline"
+              size="sm"
+              className={[
+                "h-8 rounded px-4 text-[13px] font-medium transition-colors",
+                dark
+                  ? "border-white/30 bg-transparent text-white hover:border-white/55 hover:bg-transparent"
+                  : "border-border bg-transparent text-foreground hover:border-primary hover:text-primary",
+              ].join(" ")}
+            >
+              دخول الإدارة
+            </Button>
+          </Link>
         </div>
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen((v) => !v)} aria-label="القائمة">
-          <Menu className="h-5 w-5" />
+
+        {/* Mobile hamburger */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={dark ? "md:hidden text-white hover:bg-white/10" : "md:hidden"}
+          onClick={() => setOpen((v) => !v)}
+          aria-label="القائمة"
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </div>
+
+      {/* Mobile drawer */}
       {open && (
-        <div className="md:hidden border-t border-border bg-surface">
-          <nav className="container mx-auto max-w-7xl px-4 py-3 flex flex-col gap-1">
+        <div
+          className={[
+            "border-t md:hidden",
+            dark
+              ? "border-white/15 bg-[rgba(18,15,14,0.94)] backdrop-blur-md"
+              : "border-border bg-background",
+          ].join(" ")}
+        >
+          <nav className="container mx-auto flex max-w-7xl flex-col px-4 py-2">
             {links.map((l) => (
-              <Link key={l.to} to={l.to} className="px-3 py-2 rounded-md hover:bg-primary-tint" onClick={() => setOpen(false)}>{l.label}</Link>
+              <Link
+                key={l.to}
+                to={l.to}
+                className={[
+                  "px-3 py-2.5 text-[14px] border-b last:border-0",
+                  dark
+                    ? "border-white/10 text-white/80 hover:text-white"
+                    : "border-border/60 text-foreground/75 hover:text-foreground",
+                ].join(" ")}
+                onClick={() => setOpen(false)}
+              >
+                {l.label}
+              </Link>
             ))}
-            <Link to="/login" className="px-3 py-2 rounded-md text-primary font-medium" onClick={() => setOpen(false)}>دخول الإدارة</Link>
+            <Link
+              to="/login"
+              className={[
+                "px-3 py-2.5 text-[14px] font-medium",
+                dark ? "text-accent" : "text-primary",
+              ].join(" ")}
+              onClick={() => setOpen(false)}
+            >
+              دخول الإدارة
+            </Link>
           </nav>
         </div>
       )}

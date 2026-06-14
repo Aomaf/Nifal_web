@@ -1,21 +1,32 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { listPublicProperties, getHomeStats, listLatestProjects, listBestSellingProjects } from "@/lib/properties.functions";
+import { useState, useEffect } from "react";
+import {
+  getHomeStats,
+  getPropertyByRegaCode,
+  listBestSellingProjects,
+  listLatestProjects,
+  listPublicProperties,
+} from "@/lib/properties.functions";
+import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
-import { PropertyCard } from "@/components/site/property-card";
+import { PropertyCard, type PropertyCardData } from "@/components/site/property-card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Building2, MapPin, HandshakeIcon, Eye, Target, Shield, MessageCircle, CheckCircle2 } from "lucide-react";
-import { buildWhatsAppUrl, COMPANY_WHATSAPP, formatNumber, formatSAR } from "@/lib/format";
+import { ArrowUpLeft, Building2, ChevronDown, ChevronUp, Eye, HandshakeIcon, MapPin, MessageCircle } from "lucide-react";
+import { buildWhatsAppUrl, COMPANY_WHATSAPP, formatNumber } from "@/lib/format";
 
 const featuredQO = queryOptions({
   queryKey: ["home-featured"],
-  queryFn: () => listPublicProperties({ data: { featuredOnly: true, pageSize: 6, sort: "newest", page: 1 } }),
+  queryFn: () =>
+    listPublicProperties({ data: { featuredOnly: true, pageSize: 6, sort: "newest", page: 1 } }),
 });
 const statsQO = queryOptions({ queryKey: ["home-stats"], queryFn: () => getHomeStats() });
 const latestQO = queryOptions({ queryKey: ["home-latest"], queryFn: () => listLatestProjects() });
-const bestSellingQO = queryOptions({ queryKey: ["home-best-selling"], queryFn: () => listBestSellingProjects() });
+const bestSellingQO = queryOptions({
+  queryKey: ["home-best-selling"],
+  queryFn: () => listBestSellingProjects(),
+});
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => {
@@ -40,216 +51,542 @@ function Home() {
     { icon: Eye, label: "عميل سعيد", value: stats.happyClients },
   ];
 
+  const FALLBACK_IMAGES = [
+    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80",
+    "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80",
+    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80",
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80",
+  ];
+  const valueImage =
+    getCover(featured.rows[0]) ??
+    getCover(latest[0]) ??
+    getCover(bestSelling[0]) ??
+    FALLBACK_IMAGES[0];
+  const navigationCards = [
+    {
+      label: "العقارات",
+      to: "/properties",
+      image: getCover(featured.rows[1]) ?? FALLBACK_IMAGES[1],
+    },
+    {
+      label: "أحدث المشاريع",
+      to: "/properties",
+      image: getCover(latest[1]) ?? getCover(featured.rows[2]) ?? FALLBACK_IMAGES[2],
+    },
+    {
+      label: "تواصل معنا",
+      to: "/contact",
+      image: getCover(bestSelling[1]) ?? FALLBACK_IMAGES[3],
+    },
+  ] as const;
+  const valueItems = [
+    {
+      icon: "shield",
+      title: "شفافية العرض",
+      text: "السعر، الموقع، وحالة العقار تظهر بصورة مباشرة دون مبالغة.",
+    },
+    {
+      icon: "search",
+      title: "فرز سريع",
+      text: "تصفية حسب المدينة، النوع، الغرض، والأحدث أو السعر.",
+    },
+    {
+      icon: "data",
+      title: "بيانات مفيدة",
+      text: "المساحة، الغرف، ونوع العقار ضمن بطاقة نظيفة وسهلة القراءة.",
+    },
+    {
+      icon: "calm",
+      title: "عرض بصري هادئ",
+      text: "صور كبيرة ومساحات بيضاء بدون مؤثرات مشتتة.",
+    },
+  ] satisfies Array<{
+    icon: keyof typeof pixelPatterns;
+    title: string;
+    text: string;
+  }>;
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
 
-      {/* HERO */}
-      <section className="surface-hero relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, var(--accent) 0px, transparent 400px), radial-gradient(circle at 80% 80%, var(--accent) 0px, transparent 400px)" }} />
-        <div className="container mx-auto max-w-7xl px-4 py-20 md:py-28 relative">
-          <div className="max-w-3xl space-y-6">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-accent/20 text-accent text-xs font-medium border border-accent/30">
-              نِفال العقارية · شريكك في الاستثمار العقاري
-            </span>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-              عقارك المثالي <br />
-              <span className="text-accent">بين يديك</span>
-            </h1>
-            <p className="text-lg text-primary-foreground/80 max-w-2xl leading-relaxed">
-              اكتشف أفضل العقارات السكنية والتجارية في الرياض وجدة والدمام. خدمة احترافية، شفافية كاملة، وأسعار تنافسية.
-            </p>
-            <div className="flex flex-wrap gap-3 pt-4">
-              <Link to="/properties"><Button className="btn-hero h-12 px-8 text-base">تصفح العقارات</Button></Link>
-              <a href={buildWhatsAppUrl(COMPANY_WHATSAPP, "السلام عليكم، أرغب بالاستفسار عن خدماتكم العقارية")} target="_blank" rel="noopener">
-                <Button variant="outline" className="h-12 px-8 text-base border-accent/40 text-primary-foreground hover:bg-accent/10">
-                  <MessageCircle className="ms-2 h-4 w-4" /> تواصل واتساب
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <section
+        data-hero
+        className="relative isolate min-h-[calc(100dvh-4rem)] overflow-hidden text-white"
+        style={{ background: "rgb(18,15,14)" }}
+      >
+        {/* Background video — dark overlay keeps it atmospheric not distracting */}
+        <iframe
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0 opacity-30 mix-blend-screen"
+          src="https://www.youtube-nocookie.com/embed/0I-umxn_qtE?autoplay=1&mute=1&loop=1&playlist=0I-umxn_qtE&controls=0&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0"
+          title="Nifal property showcase"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+        {/* Single dark overlay — no gradient blobs */}
+        <div className="pointer-events-none absolute inset-0 bg-[rgba(18,15,14,0.55)]" />
+        {/* Bottom vignette */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-[linear-gradient(0deg,rgba(18,15,14,0.8),transparent)]" />
 
-      {/* STATS */}
-      <section className="container mx-auto max-w-7xl px-4 -mt-12 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {statItems.map((s) => (
-            <div key={s.label} className="card-elegant p-6 text-center">
-              <s.icon className="h-7 w-7 mx-auto text-accent-dark mb-2" />
-              <div className="text-3xl font-bold text-primary tabular">{formatNumber(s.value)}</div>
-              <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURED */}
-      <section className="container mx-auto max-w-7xl px-4 py-16">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold">مشاريع مميزة</h2>
-            <p className="text-muted-foreground mt-1">اختيارات منتقاة لأبرز مشاريعنا المتاحة</p>
-          </div>
-          <Link to="/properties" className="text-sm font-medium text-accent-dark hover:text-primary">عرض الكل ←</Link>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.rows.map((p) => <PropertyCard key={p.id} p={p as never} />)}
-        </div>
-      </section>
-
-      {/* LATEST PROJECTS */}
-      {latest.length > 0 && (
-        <section className="bg-primary-tint py-16">
-          <div className="container mx-auto max-w-7xl px-4">
-            <div className="flex items-end justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold">أحدث المشاريع</h2>
-                <p className="text-muted-foreground mt-1">مشاريع متاحة أضيفت حديثاً</p>
+        <div className="container relative mx-auto flex min-h-[calc(100dvh-4rem)] max-w-7xl items-end px-6 py-16 md:px-8 md:py-24">
+          <div className="grid w-full gap-10 lg:grid-cols-[1.1fr_0.7fr] lg:items-end">
+            <div className="max-w-4xl space-y-8 text-center sm:text-right">
+              <div className="space-y-5">
+                <h1 className="text-[2.2rem] font-semibold leading-[1.12] tracking-[-0.01em] sm:text-[2.8rem] lg:text-[3.2rem]">
+                  <span className="block">عقارات مختارة بعناية،</span>
+                  <span className="block text-white/85">وقرارات أوضح.</span>
+                </h1>
+                <p className="mx-auto max-w-[320px] text-[15px] font-normal leading-[1.7] text-white/55 sm:mx-0 sm:max-w-[52ch] md:text-base">
+                  نعرض لك مشاريع وفرص عقارية في السعودية بواجهة هادئة، معلومات واضحة، وتجربة تواصل
+                  مباشرة مع فريق نِفال.
+                </p>
               </div>
-              <Link to="/properties" className="text-sm font-medium text-accent-dark hover:text-primary">
-                جميع المشاريع ←
-              </Link>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {latest.map((p) => <PropertyCard key={p.id} p={p as never} />)}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* BEST SELLING */}
-      {bestSelling.length > 0 && (
-        <section className="container mx-auto max-w-7xl px-4 py-16">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold">المشاريع الأكثر مبيعاً</h2>
-              <p className="text-muted-foreground mt-1">المشاريع الأعلى نسبة مبيعات لدينا</p>
-            </div>
-            <Link to="/properties" className="text-sm font-medium text-accent-dark hover:text-primary">
-              عرض الكل ←
-            </Link>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {bestSelling.map((p) => (
-              <Link
-                key={p.id}
-                to="/properties/$id"
-                params={{ id: p.id }}
-                className="card-elegant overflow-hidden block group"
-              >
-                <div className="relative aspect-4/3 overflow-hidden bg-muted">
-                  {(() => {
-                    const imgs = (p.property_images ?? []).slice().sort((a, b) => Number(b.is_primary) - Number(a.is_primary));
-                    const cover = imgs[0]?.image_url ?? "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1200";
-                    return (
-                      <img
-                        src={cover}
-                        alt={p.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    );
-                  })()}
-                  <div className="absolute top-3 right-3 flex gap-2">
-                    {p.sold_percentage != null && (
-                      <Badge className="bg-primary text-primary-foreground">
-                        {p.sold_percentage}% مباع
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-                <div className="p-4 space-y-3">
-                  <h3 className="font-bold text-base line-clamp-1 group-hover:text-primary transition-colors">{p.title}</h3>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <MapPin className="h-3 w-3" /> {p.city}{p.district ? ` · ${p.district}` : ""}
-                  </p>
-                  {p.sold_percentage != null && (
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>نسبة المبيعات</span>
-                        <span className="font-semibold text-primary">{p.sold_percentage}%</span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-linear-to-l from-accent to-accent-dark transition-all"
-                          style={{ width: `${p.sold_percentage}%` }}
-                        />
-                      </div>
-                    </div>
+              <div className="grid gap-3 pt-1 sm:flex sm:flex-wrap">
+                <Link to="/properties" className="w-full sm:w-auto">
+                  <Button className="h-11 w-full rounded bg-primary px-7 text-[13px] font-medium text-primary-foreground shadow-sm transition hover:bg-primary/88 sm:w-auto">
+                    تصفح العقارات
+                    <ArrowUpLeft className="ms-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <a
+                  href={buildWhatsAppUrl(
+                    COMPANY_WHATSAPP,
+                    "السلام عليكم، أرغب بالاستفسار عن عقارات نِفال",
                   )}
-                  <div className="flex items-center justify-between pt-1 border-t border-border">
-                    <span className="text-lg font-bold text-primary tabular">{formatSAR(p.price)}</span>
-                    <span className="text-xs text-accent-dark font-medium">شاهد التفاصيل ←</span>
+                  target="_blank"
+                  rel="noopener"
+                  className="w-full sm:w-auto"
+                >
+                  <Button
+                    variant="outline"
+                    className="h-11 w-full rounded border-white/25 bg-transparent px-7 text-[13px] font-medium text-white transition hover:border-white/45 hover:bg-transparent sm:w-auto"
+                  >
+                    <MessageCircle className="ms-2 h-4 w-4" />
+                    تواصل واتساب
+                  </Button>
+                </a>
+              </div>
+            </div>
+
+            <div className="hidden justify-self-end md:block lg:w-96">
+              <RegaSearchCard />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border/70 bg-surface">
+        <div className="container mx-auto max-w-7xl px-6 md:px-8">
+          <div className="grid grid-cols-2 divide-x divide-x-reverse divide-border/60 md:grid-cols-4">
+            {statItems.map((item) => (
+              <div key={item.label} className="flex items-center gap-4 px-6 py-7 first:ps-0 last:pe-0 md:py-9">
+                <item.icon className="h-6 w-6 shrink-0 text-accent-dark" />
+                <div>
+                  <div className="tabular text-[1.75rem] font-medium leading-none text-primary">
+                    {formatNumber(item.value)}
                   </div>
+                  <div className="mt-1.5 text-[12px] text-muted-foreground">
+                    {item.label}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-background py-16 md:py-24">
+        <div className="container mx-auto max-w-7xl px-6 md:px-8">
+          <div className="grid gap-5 md:grid-cols-3">
+            {navigationCards.map((card) => (
+              <Link
+                key={card.label}
+                to={card.to}
+                className="group relative block aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100"
+              >
+                <img
+                  src={card.image}
+                  alt=""
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(24,20,18,0.02),rgba(24,20,18,0.58))]" />
+                <div className="absolute inset-x-5 bottom-5 flex items-center justify-between gap-4">
+                  <span className="text-[21px] font-medium leading-none text-white">
+                    {card.label}
+                  </span>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/12 text-white backdrop-blur transition group-hover:bg-white/20">
+                    <ArrowUpLeft className="h-4 w-4" />
+                  </span>
                 </div>
               </Link>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
+
+      <PropertySection
+        title="اختيارات تناسب السكن والاستثمار"
+        description="عقارات منتقاة من فريق نِفال، مرتبة بصورة واضحة حتى تقارن بين السعر، الموقع، والمساحة بسرعة."
+        properties={featured.rows as PropertyCardData[]}
+      />
+
+      {latest.length > 0 && (
+        <PropertySection
+          title="فرص أضيفت حديثا"
+          description="تابع أحدث العقارات المتاحة في المدن التي نخدمها، مع تفاصيل مركزة وصور تقود القرار."
+          properties={latest as PropertyCardData[]}
+          muted
+        />
       )}
 
-      {/* WHY US */}
-      <section className="bg-primary-tint py-16">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold">لماذا تختار نِفال؟</h2>
-            <p className="text-muted-foreground mt-2">قيمنا التي نلتزم بها مع كل عميل</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              { icon: Eye, title: "رؤيتنا", text: "أن نكون الخيار الأول للعملاء في تقديم الحلول العقارية المتكاملة في المملكة." },
-              { icon: Target, title: "رسالتنا", text: "تمكين عملائنا من اتخاذ قرارات عقارية ذكية من خلال الشفافية والاحترافية." },
-              { icon: Shield, title: "قيمنا", text: "النزاهة، الجودة، الالتزام، والشغف بخدمة عملائنا في كل تفاصيل التعامل." },
-            ].map((v) => (
-              <div key={v.title} className="card-elegant p-8 text-center">
-                <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent-dark text-primary mb-4">
-                  <v.icon className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">{v.title}</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">{v.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ValueSection
+        valueItems={valueItems}
+        images={[
+          getCover(featured.rows[0]) ?? FALLBACK_IMAGES[0],
+          getCover(featured.rows[1]) ?? FALLBACK_IMAGES[1],
+          getCover(latest[0]) ?? FALLBACK_IMAGES[2],
+          getCover(bestSelling[0]) ?? FALLBACK_IMAGES[3],
+        ]}
+      />
 
-      {/* STATISTICS */}
-      <section className="container mx-auto max-w-7xl px-4 py-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold">الإحصائيات</h2>
-          <p className="text-muted-foreground mt-2">أرقام تعكس ثقة عملائنا وحجم تجربتنا</p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { icon: Building2, value: formatNumber(stats.totalProperties), label: "إجمالي العقارات" },
-            { icon: CheckCircle2, value: formatNumber(stats.availableProjects), label: "مشروع متاح" },
-            { icon: HandshakeIcon, value: formatNumber(stats.completedDeals), label: "صفقة منجزة" },
-            { icon: Eye, value: formatNumber(stats.happyClients), label: "عميل سعيد" },
-          ].map((s) => (
-            <div key={s.label} className="card-elegant p-8 text-center">
-              <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-linear-to-br from-accent/20 to-accent/40 text-accent-dark mb-4">
-                <s.icon className="h-6 w-6" />
-              </div>
-              <div className="text-4xl font-bold text-primary tabular mb-1">{s.value}</div>
-              <div className="text-sm text-muted-foreground">{s.label}</div>
+      {bestSelling.length > 0 && (
+        <PropertySection
+          title="مشاريع عليها طلب واضح"
+          description="عقارات حققت اهتماما أعلى، مناسبة لمن يبحث عن مؤشرات طلب قبل التواصل."
+          properties={bestSelling as PropertyCardData[]}
+        />
+      )}
+
+      <section className="px-6 pb-20 md:px-8 md:pb-28">
+        <div className="container mx-auto max-w-7xl rounded-lg bg-primary px-6 py-12 text-primary-foreground md:px-10 md:py-16">
+          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <h2 className="mt-4 text-3xl font-medium leading-[1.25] md:text-[2rem]">
+                اختر العقار، واترك التفاصيل علينا.
+              </h2>
+              <p className="mt-5 max-w-2xl text-[15px] leading-[1.7] text-primary-foreground/72">
+                فريق نِفال جاهز لترتيب الاستفسار، الزيارة، أو الخطوة التالية حسب احتياجك.
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="container mx-auto max-w-7xl px-4 py-16">
-        <div className="surface-hero rounded-3xl p-10 md:p-16 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">جاهز لتجد عقارك المثالي؟</h2>
-          <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">فريقنا جاهز للإجابة على استفساراتك ومساعدتك في اتخاذ القرار الأفضل</p>
-          <a href={buildWhatsAppUrl(COMPANY_WHATSAPP, "السلام عليكم، أرغب بالتواصل معكم")} target="_blank" rel="noopener">
-            <Button className="btn-hero h-12 px-8 text-base"><MessageCircle className="ms-2 h-4 w-4" /> تواصل عبر واتساب</Button>
-          </a>
+            <a
+              href={buildWhatsAppUrl(COMPANY_WHATSAPP, "السلام عليكم، أرغب بالتواصل معكم")}
+              target="_blank"
+              rel="noopener"
+            >
+              <Button className="h-12 rounded-md bg-primary px-8 text-[13px] font-medium text-primary-foreground hover:bg-primary/85">
+                <MessageCircle className="ms-2 h-4 w-4" />
+                تواصل عبر واتساب
+              </Button>
+            </a>
+          </div>
         </div>
       </section>
 
       <SiteFooter />
     </div>
   );
+}
+
+function PropertySection({
+  title,
+  description,
+  properties,
+  muted = false,
+}: {
+  title: string;
+  description: string;
+  properties: PropertyCardData[];
+  muted?: boolean;
+}) {
+  if (properties.length === 0) return null;
+
+  return (
+    <section className={muted ? "bg-surface py-20 md:py-28" : "bg-background py-20 md:py-28"}>
+      <div className="container mx-auto max-w-7xl px-6 md:px-8">
+        <div className="mb-10 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+          <div className="space-y-5">
+            <h2 className="max-w-3xl text-[2.5rem] font-medium leading-[1.12] text-foreground md:text-[2.75rem]">
+              {title}
+            </h2>
+            <p className="max-w-[60ch] text-[15px] leading-[1.7] text-muted-foreground md:text-base">
+              {description}
+            </p>
+          </div>
+          <Link
+            to="/properties"
+            className="inline-flex h-12 w-fit items-center justify-center rounded-md bg-primary px-7 text-[13px] font-medium text-primary-foreground transition hover:bg-primary-hover"
+          >
+            عرض الكل
+            <ArrowUpLeft className="ms-2 h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {properties.slice(0, 6).map((property) => (
+            <PropertyCard key={property.id} p={property} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const pixelPatterns = {
+  shield: [
+    "00111100",
+    "01111110",
+    "11011011",
+    "11011011",
+    "11111111",
+    "01111110",
+    "00111100",
+    "00011000",
+  ],
+  search: [
+    "00111100",
+    "01100110",
+    "11000011",
+    "11000011",
+    "01100110",
+    "00111100",
+    "00001100",
+    "00000110",
+  ],
+  data: [
+    "01111110",
+    "01000010",
+    "01111110",
+    "01000010",
+    "01111110",
+    "01000010",
+    "01111110",
+    "00000000",
+  ],
+  calm: [
+    "00011000",
+    "10011001",
+    "01111110",
+    "00111100",
+    "01111110",
+    "10011001",
+    "00011000",
+    "00000000",
+  ],
+} as const;
+
+function PixelIcon({ kind }: { kind: keyof typeof pixelPatterns }) {
+  return (
+    <span className="grid h-9 w-9 grid-cols-8 gap-[2px]" aria-hidden="true">
+      {pixelPatterns[kind].flatMap((row, rowIndex) =>
+        row
+          .split("")
+          .map((cell, columnIndex) => (
+            <span
+              key={`${rowIndex}-${columnIndex}`}
+              className={
+                cell === "1" ? "h-[3px] w-[3px] rounded-full bg-foreground" : "h-[3px] w-[3px]"
+              }
+            />
+          )),
+      )}
+    </span>
+  );
+}
+
+function RegaSearchCard() {
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const navigate = useNavigate();
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    setLoading(true);
+    setNotFound(false);
+    try {
+      const property = await getPropertyByRegaCode({ data: { rega_ad_code: trimmed } });
+      if (property) {
+        navigate({ to: "/properties/$id", params: { id: property.id } });
+      } else {
+        setNotFound(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="rounded-md border border-border bg-background p-6 shadow-md">
+      <h3 className="text-[17px] font-semibold leading-snug text-foreground text-right">ابحث بمعرف الإعلان</h3>
+      <p className="mt-2 text-[13px] leading-[1.6] text-muted-foreground text-right">
+        أدخل رقم معرف الإعلان العقاري للوصول مباشرة إلى تفاصيل العقار.
+      </p>
+      <form onSubmit={handleSearch} className="mt-4 space-y-2.5">
+        <Input
+          dir="ltr"
+          value={code}
+          onChange={(e) => {
+            setCode(e.target.value);
+            setNotFound(false);
+          }}
+          placeholder="مثال: 1234567890"
+          className="h-10 rounded border-border bg-background text-foreground placeholder:text-right placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary/40"
+          disabled={loading}
+          autoComplete="off"
+        />
+        {notFound && <p className="text-[12px] text-destructive text-right">لم يُعثر على إعلان بهذا المعرف.</p>}
+        <button
+          type="submit"
+          disabled={loading || !code.trim()}
+          className="flex h-10 w-full items-center justify-center gap-2 rounded bg-primary text-[13px] font-medium text-primary-foreground transition hover:bg-primary/88 disabled:opacity-40"
+        >
+          {loading ? (
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+          ) : (
+            <ArrowUpLeft className="h-3.5 w-3.5" />
+          )}
+          {loading ? "جارٍ البحث…" : "بحث"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function ValueSection({
+  valueItems,
+  images,
+}: {
+  valueItems: Array<{ icon: keyof typeof pixelPatterns; title: string; text: string }>;
+  images: (string | undefined)[];
+}) {
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [hoverPaused, setHoverPaused] = useState(false);
+  const total = images.length;
+
+  const prev = () => setSlideIndex((i) => (i - 1 + total) % total);
+  const next = () => setSlideIndex((i) => (i + 1) % total);
+
+  // Auto-advance every 4s unless user is hovering
+  useEffect(() => {
+    if (hoverPaused) return;
+    const id = setTimeout(() => setSlideIndex((i) => (i + 1) % total), 4000);
+    return () => clearTimeout(id);
+  }, [slideIndex, hoverPaused, total]);
+
+  return (
+    <section className="bg-surface py-20 md:py-28">
+      <div className="container mx-auto grid max-w-7xl gap-10 px-6 md:px-8 lg:grid-cols-[0.96fr_1.04fr] lg:items-start">
+        {/* Feature cards — RTL: icon on the start (right) side */}
+        <div className="space-y-8 lg:col-start-2 lg:row-start-1">
+          <div className="space-y-5">
+            <h2 className="max-w-xl text-[2.6rem] font-medium leading-[1.1] text-foreground md:text-[3.35rem]">
+              الأساسيات العقارية، مرتبة بوضوح.
+            </h2>
+            <p className="max-w-[58ch] text-[15px] leading-[1.7] text-muted-foreground md:text-base">
+              تجربة نِفال تضع الصورة والمعلومة في المقدمة، مع تفاصيل عملية تساعد العميل على
+              المقارنة قبل التواصل.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {valueItems.map((item) => (
+              <div
+                key={item.title}
+                className="flex flex-row-reverse items-start gap-4 rounded-lg border border-border bg-background p-5"
+              >
+                {/* Icon on the right (RTL start side) */}
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center text-foreground">
+                  <PixelIcon kind={item.icon} />
+                </div>
+                <div className="min-w-0 text-right">
+                  <h3 className="text-[16px] font-semibold text-foreground">{item.title}</h3>
+                  <p className="mt-1 text-[14px] leading-[1.55] text-muted-foreground">
+                    {item.text}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Image slider */}
+        <div
+          className="relative min-h-[480px] overflow-hidden rounded-lg border border-border bg-neutral-100 md:min-h-[560px] lg:col-start-1 lg:row-start-1"
+          onMouseEnter={() => setHoverPaused(true)}
+          onMouseLeave={() => setHoverPaused(false)}
+        >
+          {images.map((src, i) => (
+            <img
+              key={i}
+              src={src ?? "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80"}
+              alt=""
+              className={[
+                "absolute inset-0 h-full w-full object-cover transition-opacity duration-500",
+                i === slideIndex ? "opacity-100" : "opacity-0",
+              ].join(" ")}
+              loading="lazy"
+            />
+          ))}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,24,22,0.00),rgba(28,24,22,0.12))]" />
+
+          {/* Caption — end-6 (RTL right side) */}
+          <div className="absolute end-6 top-6 max-w-xs rounded-lg bg-[rgba(24,20,18,0.88)] p-5 text-white shadow-[0_20px_60px_-35px_rgba(0,0,0,0.85)] backdrop-blur">
+            <p className="text-[15px] font-medium leading-[1.6]">
+              تفاصيل واضحة تساعد العميل على اختيار العقار بثقة.
+            </p>
+          </div>
+
+          {/* Arrow buttons — bottom end (RTL right) */}
+          <div className="absolute bottom-6 end-6 flex gap-2">
+            <button
+              onClick={prev}
+              className="flex h-11 w-11 items-center justify-center rounded-lg bg-surface/90 text-foreground shadow-sm backdrop-blur transition hover:bg-surface"
+              aria-label="الصورة السابقة"
+            >
+              <ChevronUp className="h-5 w-5" />
+            </button>
+            <button
+              onClick={next}
+              className="flex h-11 w-11 items-center justify-center rounded-lg bg-surface/90 text-foreground shadow-sm backdrop-blur transition hover:bg-surface"
+              aria-label="الصورة التالية"
+            >
+              <ChevronDown className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Dot indicators */}
+          <div className="absolute bottom-6 start-6 flex gap-1.5">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSlideIndex(i)}
+                aria-label={`الصورة ${i + 1}`}
+                className={[
+                  "h-1.5 rounded-full transition-all duration-300",
+                  i === slideIndex ? "w-5 bg-white" : "w-1.5 bg-white/40",
+                ].join(" ")}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function getCover(property?: {
+  property_images?:
+    | { image_url: string; is_primary: boolean | null; sort_order: number | null }[]
+    | null;
+}) {
+  return property?.property_images
+    ?.slice()
+    .sort(
+      (a, b) =>
+        Number(b.is_primary) - Number(a.is_primary) || (a.sort_order ?? 0) - (b.sort_order ?? 0),
+    )[0]?.image_url;
 }

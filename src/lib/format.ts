@@ -1,11 +1,11 @@
 export function formatSAR(value: number | null | undefined): string {
   if (value == null) return "—";
-  return new Intl.NumberFormat("ar-SA", { maximumFractionDigits: 0 }).format(value) + " ر.س";
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
 }
 
 export function formatNumber(value: number | null | undefined): string {
   if (value == null) return "—";
-  return new Intl.NumberFormat("ar-SA").format(value);
+  return new Intl.NumberFormat("en-US").format(value);
 }
 
 export const PROPERTY_TYPE_LABELS: Record<string, string> = {

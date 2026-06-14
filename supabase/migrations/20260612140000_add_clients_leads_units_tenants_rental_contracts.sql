@@ -18,8 +18,13 @@ CREATE TABLE IF NOT EXISTS clients (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "service role full access" ON clients;
-CREATE POLICY "service role full access" ON clients USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.clients TO authenticated;
+GRANT ALL ON public.clients TO service_role;
+DROP POLICY IF EXISTS "clients_manage" ON clients;
+CREATE POLICY "clients_manage" ON clients
+  FOR ALL TO authenticated
+  USING (public.can_manage_properties(auth.uid()))
+  WITH CHECK (public.can_manage_properties(auth.uid()));
 
 -- leads table
 CREATE TABLE IF NOT EXISTS leads (
@@ -37,8 +42,13 @@ CREATE TABLE IF NOT EXISTS leads (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "service role full access" ON leads;
-CREATE POLICY "service role full access" ON leads USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.leads TO authenticated;
+GRANT ALL ON public.leads TO service_role;
+DROP POLICY IF EXISTS "leads_manage" ON leads;
+CREATE POLICY "leads_manage" ON leads
+  FOR ALL TO authenticated
+  USING (public.can_manage_properties(auth.uid()))
+  WITH CHECK (public.can_manage_properties(auth.uid()));
 
 -- units table
 CREATE TABLE IF NOT EXISTS units (
@@ -55,8 +65,13 @@ CREATE TABLE IF NOT EXISTS units (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE units ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "service role full access" ON units;
-CREATE POLICY "service role full access" ON units USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.units TO authenticated;
+GRANT ALL ON public.units TO service_role;
+DROP POLICY IF EXISTS "units_manage" ON units;
+CREATE POLICY "units_manage" ON units
+  FOR ALL TO authenticated
+  USING (public.can_manage_properties(auth.uid()))
+  WITH CHECK (public.can_manage_properties(auth.uid()));
 
 -- tenants table
 CREATE TABLE IF NOT EXISTS tenants (
@@ -70,8 +85,13 @@ CREATE TABLE IF NOT EXISTS tenants (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "service role full access" ON tenants;
-CREATE POLICY "service role full access" ON tenants USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.tenants TO authenticated;
+GRANT ALL ON public.tenants TO service_role;
+DROP POLICY IF EXISTS "tenants_manage" ON tenants;
+CREATE POLICY "tenants_manage" ON tenants
+  FOR ALL TO authenticated
+  USING (public.can_manage_properties(auth.uid()))
+  WITH CHECK (public.can_manage_properties(auth.uid()));
 
 -- rental_contracts table
 CREATE TABLE IF NOT EXISTS rental_contracts (
@@ -90,5 +110,10 @@ CREATE TABLE IF NOT EXISTS rental_contracts (
   CONSTRAINT end_after_start CHECK (end_date > start_date)
 );
 ALTER TABLE rental_contracts ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "service role full access" ON rental_contracts;
-CREATE POLICY "service role full access" ON rental_contracts USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.rental_contracts TO authenticated;
+GRANT ALL ON public.rental_contracts TO service_role;
+DROP POLICY IF EXISTS "rental_contracts_manage" ON rental_contracts;
+CREATE POLICY "rental_contracts_manage" ON rental_contracts
+  FOR ALL TO authenticated
+  USING (public.can_manage_properties(auth.uid()))
+  WITH CHECK (public.can_manage_properties(auth.uid()));

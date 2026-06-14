@@ -7,7 +7,7 @@ export const listAdminOwners = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("owners")
-      .select("*")
+      .select("*, properties(id,price,status,title,city,type)")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];

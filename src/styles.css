@@ -1,6 +1,81 @@
 @import "tailwindcss" source(none);
 @source "../src";
+@source "../apps";
 @import "tw-animate-css";
+
+/* ── Thmanyah Sans (self-hosted) ────────────────────────────────── */
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("/thmanyah-sans/thmanyahsans-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("/thmanyah-sans/thmanyahsans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("/thmanyah-sans/thmanyahsans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("/thmanyah-sans/thmanyahsans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("/thmanyah-sans/thmanyahsans-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Thmanyah Serif Display (self-hosted) ───────────────────────── */
+@font-face {
+  font-family: "Thmanyah Serif";
+  src: url("/thmanyah-serif/thmanyahserifdisplay-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Serif";
+  src: url("/thmanyah-serif/thmanyahserifdisplay-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Serif";
+  src: url("/thmanyah-serif/thmanyahserifdisplay-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Serif";
+  src: url("/thmanyah-serif/thmanyahserifdisplay-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Serif";
+  src: url("/thmanyah-serif/thmanyahserifdisplay-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -44,88 +119,282 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
-  --font-sans: "IBM Plex Sans Arabic", "Tajawal", system-ui, sans-serif;
+  --font-sans: "Thmanyah Sans", system-ui, sans-serif;
+  --font-display: "Thmanyah Serif", "Thmanyah Sans", system-ui, serif;
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.5rem;
   /* Brand */
-  --primary: oklch(0.30 0.07 18);          /* burgundy #4A1518 */
+  --primary: oklch(0.3 0.07 18); /* burgundy #4A1518 */
   --primary-foreground: oklch(0.98 0.01 80);
   --primary-hover: oklch(0.36 0.08 18);
   --primary-dark: oklch(0.22 0.06 18);
   --primary-tint: oklch(0.96 0.02 18);
 
-  --accent: oklch(0.74 0.10 80);           /* gold #C9A56A */
+  --accent: oklch(0.74 0.1 80); /* gold #C9A56A */
   --accent-foreground: oklch(0.25 0.06 18);
-  --accent-hover: oklch(0.80 0.10 82);
+  --accent-hover: oklch(0.8 0.1 82);
   --accent-dark: oklch(0.62 0.09 78);
   --accent-tint: oklch(0.97 0.02 85);
 
-  --background: oklch(0.97 0.01 80);       /* warm cream #FAF7F2 */
+  --background: oklch(0.995 0 0); /* gallery white */
   --surface: oklch(1 0 0);
-  --foreground: oklch(0.20 0.02 18);
+  --foreground: oklch(0.2 0.02 18);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.20 0.02 18);
+  --card-foreground: oklch(0.2 0.02 18);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0.02 18);
-  --secondary: oklch(0.94 0.02 80);
-  --secondary-foreground: oklch(0.30 0.07 18);
-  --muted: oklch(0.95 0.01 80);
-  --muted-foreground: oklch(0.50 0.02 60);
+  --popover-foreground: oklch(0.2 0.02 18);
+  --secondary: oklch(0.955 0 0);
+  --secondary-foreground: oklch(0.3 0.07 18);
+  --muted: oklch(0.945 0 0);
+  --muted-foreground: oklch(0.5 0.02 60);
   --destructive: oklch(0.55 0.18 22);
   --destructive-foreground: oklch(0.98 0 0);
   --success: oklch(0.58 0.13 150);
-  --warning: oklch(0.70 0.13 80);
+  --warning: oklch(0.7 0.13 80);
   --whatsapp: oklch(0.74 0.16 150);
-  --border: oklch(0.90 0.02 75);
-  --input: oklch(0.92 0.02 75);
-  --ring: oklch(0.74 0.10 80);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.74 0.1 80);
 
   --sidebar: oklch(0.22 0.06 18);
   --sidebar-foreground: oklch(0.97 0.02 85);
-  --sidebar-accent: oklch(0.30 0.07 18);
+  --sidebar-accent: oklch(0.3 0.07 18);
   --sidebar-accent-foreground: oklch(0.97 0.02 85);
   --sidebar-border: oklch(0.36 0.06 18);
 
-  --gradient-hero: linear-gradient(135deg, oklch(0.22 0.06 18) 0%, oklch(0.30 0.07 18) 50%, oklch(0.36 0.08 22) 100%);
-  --gradient-gold: linear-gradient(135deg, oklch(0.80 0.10 82), oklch(0.62 0.09 78));
-  --shadow-soft: 0 4px 16px -4px oklch(0.30 0.07 18 / 0.10);
-  --shadow-elegant: 0 12px 40px -10px oklch(0.30 0.07 18 / 0.18);
+  --gradient-hero: linear-gradient(135deg, oklch(0.22 0.06 18) 0%, oklch(0.3 0.07 18) 100%);
+  --gradient-gold: linear-gradient(135deg, oklch(0.78 0.09 82), oklch(0.64 0.08 78));
+  --shadow-soft: 0 8px 24px -22px oklch(0.3 0.07 18 / 0.35);
+  --shadow-elegant: 0 22px 55px -36px oklch(0.3 0.07 18 / 0.45);
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { font-family: var(--font-sans); }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-feature-settings: "ss01", "cv11";
+    overflow-x: hidden;
   }
-  h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.01em; }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 700;
+    letter-spacing: 0;
+  }
   /* Tabular numerals for Arabic-Indic/Latin numbers in tables/cards */
-  .tabular { font-variant-numeric: tabular-nums; }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 @utility btn-hero {
-  background-image: var(--gradient-gold);
+  background-color: var(--color-accent);
   color: var(--color-accent-foreground);
   font-weight: 600;
-  box-shadow: var(--shadow-soft);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  &:hover { transform: translateY(-1px); box-shadow: var(--shadow-elegant); }
+  box-shadow: none;
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease;
+  &:hover {
+    transform: translateY(-1px);
+    background-color: var(--color-accent-hover);
+  }
 }
 
 @utility card-elegant {
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-  &:hover { box-shadow: var(--shadow-elegant); transform: translateY(-2px); }
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  &:hover {
+    box-shadow: var(--shadow-elegant);
+    transform: translateY(-2px);
+  }
 }
 
 @utility surface-hero {
   background-image: var(--gradient-hero);
   color: var(--color-primary-foreground);
+}
+
+/* ── Status badges ─────────────────────────────────────────── */
+@utility status-available {
+  background-color: oklch(0.58 0.13 150 / 0.12);
+  color: oklch(0.38 0.12 150);
+  border-color: oklch(0.58 0.13 150 / 0.3);
+}
+@utility status-sold {
+  background-color: oklch(0.3 0.07 18 / 0.1);
+  color: oklch(0.3 0.07 18);
+  border-color: oklch(0.3 0.07 18 / 0.25);
+}
+@utility status-rented {
+  background-color: oklch(0.55 0.12 250 / 0.12);
+  color: oklch(0.38 0.12 250);
+  border-color: oklch(0.55 0.12 250 / 0.3);
+}
+@utility status-reserved {
+  background-color: oklch(0.74 0.1 80 / 0.15);
+  color: oklch(0.5 0.09 75);
+  border-color: oklch(0.74 0.1 80 / 0.35);
+}
+@utility status-vacant {
+  background-color: oklch(0.5 0.02 60 / 0.1);
+  color: oklch(0.45 0.02 60);
+  border-color: oklch(0.5 0.02 60 / 0.25);
+}
+
+/* ── Priority badges ───────────────────────────────────────── */
+@utility priority-high {
+  background-color: oklch(0.55 0.18 22 / 0.12);
+  color: oklch(0.42 0.16 22);
+  border-color: oklch(0.55 0.18 22 / 0.3);
+}
+@utility priority-medium {
+  background-color: oklch(0.74 0.1 80 / 0.15);
+  color: oklch(0.5 0.09 75);
+  border-color: oklch(0.74 0.1 80 / 0.3);
+}
+@utility priority-low {
+  background-color: oklch(0.58 0.13 150 / 0.1);
+  color: oklch(0.38 0.12 150);
+  border-color: oklch(0.58 0.13 150 / 0.25);
+}
+
+/* ── CRM stage badges ──────────────────────────────────────── */
+@utility stage-lead {
+  background-color: oklch(0.55 0.12 250 / 0.12);
+  color: oklch(0.38 0.12 250);
+  border-color: oklch(0.55 0.12 250 / 0.28);
+}
+@utility stage-prospect {
+  background-color: oklch(0.74 0.1 80 / 0.15);
+  color: oklch(0.5 0.09 78);
+  border-color: oklch(0.74 0.1 80 / 0.3);
+}
+@utility stage-active {
+  background-color: oklch(0.58 0.13 150 / 0.12);
+  color: oklch(0.36 0.12 148);
+  border-color: oklch(0.58 0.13 150 / 0.28);
+}
+@utility stage-negotiation {
+  background-color: oklch(0.3 0.07 18 / 0.1);
+  color: oklch(0.3 0.07 18);
+  border-color: oklch(0.3 0.07 18 / 0.22);
+}
+@utility stage-closed {
+  background-color: oklch(0.22 0.06 18 / 0.08);
+  color: oklch(0.22 0.06 18);
+  border-color: oklch(0.22 0.06 18 / 0.18);
+}
+@utility stage-lost {
+  background-color: oklch(0.55 0.18 22 / 0.1);
+  color: oklch(0.42 0.16 22);
+  border-color: oklch(0.55 0.18 22 / 0.25);
+}
+
+/* ── Role badges ───────────────────────────────────────────── */
+@utility role-super-admin {
+  background-image: var(--gradient-hero);
+  color: var(--color-primary-foreground);
+  border-color: oklch(0.3 0.07 18 / 0.4);
+}
+@utility role-sales-manager {
+  background-color: oklch(0.3 0.07 18 / 0.12);
+  color: oklch(0.3 0.07 18);
+  border-color: oklch(0.3 0.07 18 / 0.25);
+}
+@utility role-sales {
+  background-color: oklch(0.74 0.1 80 / 0.15);
+  color: oklch(0.5 0.09 78);
+  border-color: oklch(0.74 0.1 80 / 0.3);
+}
+@utility role-property-manager {
+  background-color: oklch(0.55 0.12 250 / 0.12);
+  color: oklch(0.36 0.12 250);
+  border-color: oklch(0.55 0.12 250 / 0.28);
+}
+@utility role-accountant {
+  background-color: oklch(0.58 0.13 150 / 0.12);
+  color: oklch(0.36 0.12 148);
+  border-color: oklch(0.58 0.13 150 / 0.28);
+}
+@utility role-marketing {
+  background-color: oklch(0.55 0.15 300 / 0.12);
+  color: oklch(0.4 0.14 298);
+  border-color: oklch(0.55 0.15 300 / 0.28);
+}
+
+/* ── KPI stat card ─────────────────────────────────────────── */
+@utility card-stat {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+@utility card-stat-stripe {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 25%;
+  height: 50%;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background-image: var(--gradient-gold);
+}
+
+/* ── Dashboard card ────────────────────────────────────────── */
+@utility card-dashboard {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 4px -1px oklch(0.3 0.07 18 / 0.06);
+}
+
+/* ── Entrance animation ────────────────────────────────────── */
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@utility animate-card-in {
+  animation: card-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Dashboard grid utilities ──────────────────────────────── */
+@utility dashboard-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@utility dashboard-grid-2 {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
