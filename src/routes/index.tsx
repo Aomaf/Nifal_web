@@ -479,16 +479,16 @@ function ValueSection({
 
   return (
     <section className="bg-surface py-20 md:py-28">
-      <div className="container mx-auto grid max-w-7xl gap-10 px-6 md:px-8 lg:grid-cols-[0.96fr_1.04fr] lg:items-start">
-        {/* Feature cards — RTL: icon on the start (right) side */}
+      <div className="container mx-auto grid max-w-7xl gap-12 px-6 md:px-8 lg:grid-cols-2 lg:items-center">
+        {/* Feature cards — right column in RTL (col-start-2) */}
         <div className="space-y-8 lg:col-start-2 lg:row-start-1">
-          <div className="space-y-5">
-            <h2 className="max-w-xl text-[2.6rem] font-medium leading-[1.1] text-foreground md:text-[3.35rem]">
-              الأساسيات العقارية، مرتبة بوضوح.
+          <div className="space-y-4 text-right">
+            <h2 className="text-[2.4rem] font-semibold leading-[1.15] text-foreground md:text-[3rem]">
+              الأساسيات العقارية،<br />مرتبة بوضوح.
             </h2>
-            <p className="max-w-[58ch] text-[15px] leading-[1.7] text-muted-foreground md:text-base">
-              تجربة نِفال تضع الصورة والمعلومة في المقدمة، مع تفاصيل عملية تساعد العميل على
-              المقارنة قبل التواصل.
+            <p className="text-[15px] leading-[1.75] text-muted-foreground">
+              تجربة نِفال تضع الصورة والمعلومة في المقدمة، مع تفاصيل عملية
+              تساعد العميل على المقارنة قبل التواصل.
             </p>
           </div>
 
@@ -496,26 +496,27 @@ function ValueSection({
             {valueItems.map((item) => (
               <div
                 key={item.title}
-                className="flex flex-row-reverse items-start gap-4 rounded-lg border border-border bg-background p-5"
+                className="flex items-center gap-4 rounded-xl border border-border bg-background p-5 text-right"
               >
-                {/* Icon on the right (RTL start side) */}
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center text-foreground">
-                  <PixelIcon kind={item.icon} />
-                </div>
-                <div className="min-w-0 text-right">
-                  <h3 className="text-[16px] font-semibold text-foreground">{item.title}</h3>
-                  <p className="mt-1 text-[14px] leading-[1.55] text-muted-foreground">
+                {/* Text first (RTL: renders on right), icon second (renders on left) */}
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-[15px] font-semibold text-foreground">{item.title}</h3>
+                  <p className="mt-0.5 text-[13px] leading-[1.6] text-muted-foreground">
                     {item.text}
                   </p>
+                </div>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface text-foreground">
+                  <PixelIcon kind={item.icon} />
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Image slider */}
+        {/* Image slider — left column in RTL (col-start-1) */}
         <div
-          className="relative min-h-[480px] overflow-hidden rounded-lg border border-border bg-neutral-100 md:min-h-[560px] lg:col-start-1 lg:row-start-1"
+          className="relative overflow-hidden rounded-2xl border border-border bg-neutral-100 lg:col-start-1 lg:row-start-1"
+          style={{ aspectRatio: "4/5" }}
           onMouseEnter={() => setHoverPaused(true)}
           onMouseLeave={() => setHoverPaused(false)}
         >
@@ -533,15 +534,15 @@ function ValueSection({
           ))}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,24,22,0.00),rgba(28,24,22,0.12))]" />
 
-          {/* Caption — end-6 (RTL right side) */}
-          <div className="absolute end-6 top-6 max-w-xs rounded-lg bg-[rgba(24,20,18,0.88)] p-5 text-white shadow-[0_20px_60px_-35px_rgba(0,0,0,0.85)] backdrop-blur">
-            <p className="text-[15px] font-medium leading-[1.6]">
+          {/* Caption overlay — bottom start corner */}
+          <div className="absolute bottom-20 inset-s-4 inset-e-4 rounded-xl bg-[rgba(18,15,14,0.82)] px-5 py-4 text-white backdrop-blur-sm">
+            <p className="text-[14px] font-medium leading-[1.6] text-right">
               تفاصيل واضحة تساعد العميل على اختيار العقار بثقة.
             </p>
           </div>
 
-          {/* Arrow buttons — bottom end (RTL right) */}
-          <div className="absolute bottom-6 end-6 flex gap-2">
+          {/* Arrow buttons — bottom end */}
+          <div className="absolute bottom-5 inset-e-4 flex gap-2">
             <button
               onClick={prev}
               className="flex h-11 w-11 items-center justify-center rounded-lg bg-surface/90 text-foreground shadow-sm backdrop-blur transition hover:bg-surface"
@@ -559,7 +560,7 @@ function ValueSection({
           </div>
 
           {/* Dot indicators */}
-          <div className="absolute bottom-6 start-6 flex gap-1.5">
+          <div className="absolute bottom-6 inset-s-6 flex gap-1.5">
             {images.map((_, i) => (
               <button
                 key={i}
