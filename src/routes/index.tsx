@@ -397,25 +397,23 @@ function PixelIcon({ kind }: { kind: keyof typeof pixelPatterns }) {
 
 function RegaSearchCard() {
   const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [notFound, setNotFound] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "not_found" | "error">("idle");
   const navigate = useNavigate();
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = code.trim();
+    const trimmed = code.replace(/\s/g, "");
     if (!trimmed) return;
-    setLoading(true);
-    setNotFound(false);
+    setStatus("loading");
     try {
       const property = await getPropertyByRegaCode({ data: { rega_ad_code: trimmed } });
       if (property) {
         navigate({ to: "/properties/$id", params: { id: property.id } });
       } else {
-        setNotFound(true);
+        setStatus("not_found");
       }
-    } finally {
-      setLoading(false);
+    } catch {
+      setStatus("error");
     }
   }
 
@@ -429,27 +427,39 @@ function RegaSearchCard() {
         <Input
           dir="ltr"
           value={code}
-          onChange={(e) => {
-            setCode(e.target.value);
-            setNotFound(false);
-          }}
+          onChange={(e) => { setCode(e.target.value); setStatus("idle"); }}
           placeholder="مثال: 1234567890"
-          className="h-10 rounded border-border bg-background text-foreground placeholder:text-right placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary/40"
-          disabled={loading}
+          className={[
+            "h-10 rounded text-foreground placeholder:text-right placeholder:text-muted-foreground/50 focus-visible:ring-1",
+            status === "not_found" || status === "error"
+              ? "border-destructive/60 focus-visible:ring-destructive/30"
+              : "border-border bg-background focus-visible:ring-primary/40",
+          ].join(" ")}
+          disabled={status === "loading"}
           autoComplete="off"
+          inputMode="numeric"
         />
-        {notFound && <p className="text-[12px] text-destructive text-right">لم يُعثر على إعلان بهذا المعرف.</p>}
+        {status === "not_found" && (
+          <p className="text-[12px] text-destructive text-right">
+            لم يُعثر على عقار بهذا المعرف. تحقق من الرقم وحاول مجدداً.
+          </p>
+        )}
+        {status === "error" && (
+          <p className="text-[12px] text-destructive text-right">
+            حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.
+          </p>
+        )}
         <button
           type="submit"
-          disabled={loading || !code.trim()}
+          disabled={status === "loading" || !code.trim()}
           className="flex h-10 w-full items-center justify-center gap-2 rounded bg-primary text-[13px] font-medium text-primary-foreground transition hover:bg-primary/88 disabled:opacity-40"
         >
-          {loading ? (
+          {status === "loading" ? (
             <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
           ) : (
             <ArrowUpLeft className="h-3.5 w-3.5" />
           )}
-          {loading ? "جارٍ البحث…" : "بحث"}
+          {status === "loading" ? "جارٍ البحث…" : "بحث"}
         </button>
       </form>
     </div>

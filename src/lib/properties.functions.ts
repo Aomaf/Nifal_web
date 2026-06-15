@@ -64,12 +64,14 @@ export const getPropertyByRegaCode = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Normalize: strip all whitespace, search case-insensitively
+    const code = data.rega_ad_code.replace(/\s/g, "");
     const { data: property, error } = await supabaseAdmin
       .from("properties")
       .select(
         "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,rega_ad_code,property_images(image_url,is_primary,sort_order)",
       )
-      .eq("rega_ad_code", data.rega_ad_code)
+      .ilike("rega_ad_code", code)
       .eq("is_published", true)
       .maybeSingle();
     if (error) throw new Error(error.message);

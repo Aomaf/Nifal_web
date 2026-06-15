@@ -43,58 +43,79 @@ export const Route = createFileRoute("/properties")({
 
 const CITIES = ["الرياض", "جدة", "الدمام"];
 
-function RegaSearch() {
+type RegaStatus = "idle" | "loading" | "not_found" | "error";
+
+function useRegaSearch() {
   const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [notFound, setNotFound] = useState(false);
+  const [status, setStatus] = useState<RegaStatus>("idle");
   const navigate = useNavigate();
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = code.trim();
+    const trimmed = code.replace(/\s/g, "");
     if (!trimmed) return;
-    setLoading(true);
-    setNotFound(false);
+    setStatus("loading");
     try {
       const property = await getPropertyByRegaCode({ data: { rega_ad_code: trimmed } });
       if (property) {
         navigate({ to: "/properties/$id", params: { id: property.id } });
       } else {
-        setNotFound(true);
+        setStatus("not_found");
       }
-    } finally {
-      setLoading(false);
+    } catch {
+      setStatus("error");
     }
   }
 
+  return { code, setCode: (v: string) => { setCode(v); setStatus("idle"); }, status, handleSearch };
+}
+
+function RegaSearch() {
+  const { code, setCode, status, handleSearch } = useRegaSearch();
+
   return (
-    <form onSubmit={handleSearch} className="flex items-start gap-2">
-      <div className="relative flex-1">
-        <Hash className="pointer-events-none absolute inset-s-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          dir="ltr"
-          value={code}
-          onChange={(e) => { setCode(e.target.value); setNotFound(false); }}
-          placeholder="أدخل معرف الإعلان (مثال: 1234567890)"
-          className="h-11 rounded-lg border-border bg-background ps-9 text-[13px] shadow-none placeholder:text-right"
-          disabled={loading}
-          autoComplete="off"
-        />
-        {notFound && (
-          <p className="absolute top-full mt-1 text-[12px] text-destructive">
-            لم يُعثر على إعلان بهذا المعرف.
-          </p>
-        )}
-      </div>
-      <button
-        type="submit"
-        disabled={loading || !code.trim()}
-        className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-primary px-5 text-[13px] font-medium text-primary-foreground transition hover:bg-primary/88 disabled:opacity-40"
-      >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpLeft className="h-4 w-4" />}
-        {loading ? "جارٍ البحث…" : "بحث"}
-      </button>
-    </form>
+    <div className="space-y-2">
+      <form onSubmit={handleSearch} className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Hash className="pointer-events-none absolute inset-s-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            dir="ltr"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="مثال: 1234567890"
+            className={[
+              "h-11 rounded-lg ps-9 text-[13px] shadow-none placeholder:text-right",
+              status === "not_found" || status === "error"
+                ? "border-destructive/60 focus-visible:ring-destructive/30"
+                : "border-border bg-background",
+            ].join(" ")}
+            disabled={status === "loading"}
+            autoComplete="off"
+            inputMode="numeric"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={status === "loading" || !code.trim()}
+          className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-primary px-5 text-[13px] font-medium text-primary-foreground transition hover:bg-primary/88 disabled:opacity-40"
+        >
+          {status === "loading"
+            ? <Loader2 className="h-4 w-4 animate-spin" />
+            : <ArrowUpLeft className="h-4 w-4" />}
+          {status === "loading" ? "جارٍ البحث…" : "بحث"}
+        </button>
+      </form>
+      {status === "not_found" && (
+        <p className="text-[12px] text-destructive">
+          لم يُعثر على عقار بهذا المعرف. تحقق من الرقم وحاول مجدداً.
+        </p>
+      )}
+      {status === "error" && (
+        <p className="text-[12px] text-destructive">
+          حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.
+        </p>
+      )}
+    </div>
   );
 }
 
