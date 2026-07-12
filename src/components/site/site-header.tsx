@@ -48,8 +48,8 @@ export function SiteHeader() {
           />
         </Link>
 
-        {/* Desktop nav — centre */}
-        <nav className="hidden items-center gap-7 md:flex">
+        {/* Desktop nav — absolutely centered so removing the CTA doesn't shift it */}
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-7 md:flex">
           {links.map((l) => (
             <Link
               key={l.to}
@@ -67,24 +67,6 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-
-        {/* Desktop CTA */}
-        <div className="hidden items-center md:flex">
-          <Link to="/login">
-            <Button
-              variant="outline"
-              size="sm"
-              className={[
-                "h-8 rounded px-4 text-[13px] font-medium transition-colors",
-                dark
-                  ? "border-white/30 bg-transparent text-white hover:border-white/55 hover:bg-transparent"
-                  : "border-border bg-transparent text-foreground hover:border-primary hover:text-primary",
-              ].join(" ")}
-            >
-              دخول الإدارة
-            </Button>
-          </Link>
-        </div>
 
         {/* Mobile hamburger */}
         <Button
@@ -124,16 +106,6 @@ export function SiteHeader() {
                 {l.label}
               </Link>
             ))}
-            <Link
-              to="/login"
-              className={[
-                "px-3 py-2.5 text-[14px] font-medium",
-                dark ? "text-accent" : "text-primary",
-              ].join(" ")}
-              onClick={() => setOpen(false)}
-            >
-              دخول الإدارة
-            </Link>
           </nav>
         </div>
       )}

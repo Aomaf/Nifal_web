@@ -52,7 +52,7 @@ function ResetPasswordPage() {
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("تم تحديث كلمة المرور بنجاح");
-    navigate({ to: "/login" });
+    navigate({ to: "/nifal-console" });
   };
 
   return (

@@ -17,7 +17,7 @@ const loginSchema = z.object({
 });
 const signupSchema = loginSchema.extend({ full_name: z.string().min(2, "الاسم مطلوب") });
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/nifal-console")({
   head: () => ({ meta: [{ title: "تسجيل الدخول | نِفال العقارية" }] }),
   component: LoginPage,
 });

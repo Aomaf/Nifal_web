@@ -76,7 +76,7 @@ export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
-    if (!data.session) throw redirect({ to: "/login" });
+    if (!data.session) throw redirect({ to: "/nifal-console" });
     return { user: data.session.user };
   },
   component: AdminLayout,
@@ -155,7 +155,7 @@ function AdminLayout() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
-        router.navigate({ to: "/login", replace: true });
+        router.navigate({ to: "/nifal-console", replace: true });
       } else if (event === "TOKEN_REFRESHED") {
         queryClient.invalidateQueries();
       }
@@ -179,7 +179,7 @@ function AdminLayout() {
   const signOut = async () => {
     await supabase.auth.signOut();
     toast.success("تم تسجيل الخروج");
-    router.navigate({ to: "/login", replace: true });
+    router.navigate({ to: "/nifal-console", replace: true });
   };
 
   function toggleCollapsed() {

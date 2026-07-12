@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PropertiesRouteImport } from './routes/properties'
-import { Route as LoginRouteImport } from './routes/login'
+import { Route as NifalConsoleRouteImport } from './routes/nifal-console'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -46,9 +46,9 @@ const PropertiesRoute = PropertiesRouteImport.update({
   path: '/properties',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const NifalConsoleRoute = NifalConsoleRouteImport.update({
+  id: '/nifal-console',
+  path: '/nifal-console',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -148,7 +148,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/login': typeof LoginRoute
+  '/nifal-console': typeof NifalConsoleRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -170,7 +170,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/login': typeof LoginRoute
+  '/nifal-console': typeof NifalConsoleRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -193,7 +193,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/login': typeof LoginRoute
+  '/nifal-console': typeof NifalConsoleRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -217,7 +217,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/login'
+    | '/nifal-console'
     | '/properties'
     | '/reset-password'
     | '/sitemap.xml'
@@ -239,7 +239,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/login'
+    | '/nifal-console'
     | '/properties'
     | '/reset-password'
     | '/sitemap.xml'
@@ -261,7 +261,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/contact'
-    | '/login'
+    | '/nifal-console'
     | '/properties'
     | '/reset-password'
     | '/sitemap.xml'
@@ -285,7 +285,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
-  LoginRoute: typeof LoginRoute
+  NifalConsoleRoute: typeof NifalConsoleRoute
   PropertiesRoute: typeof PropertiesRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -314,11 +314,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/nifal-console': {
+      id: '/nifal-console'
+      path: '/nifal-console'
+      fullPath: '/nifal-console'
+      preLoaderRoute: typeof NifalConsoleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -502,7 +502,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
-  LoginRoute: LoginRoute,
+  NifalConsoleRoute: NifalConsoleRoute,
   PropertiesRoute: PropertiesRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
