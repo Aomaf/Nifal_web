@@ -88,9 +88,7 @@ type NavGroup = { label: string; items: NavItem[] };
 const navGroups: NavGroup[] = [
   {
     label: "عام",
-    items: [
-      { to: "/admin", label: "لوحة التحكم", icon: LayoutDashboard, exact: true },
-    ],
+    items: [{ to: "/admin", label: "لوحة التحكم", icon: LayoutDashboard, exact: true }],
   },
   {
     label: "المبيعات والعملاء",
@@ -199,7 +197,7 @@ function AdminLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 right-0 h-screen surface-hero z-40 transform transition-all duration-200
+        className={`fixed top-0 right-0 h-screen surface-hero z-40 transform transition-all duration-200
           ${collapsed ? "w-16" : "w-64"}
           ${open ? "translate-x-0" : "translate-x-full lg:translate-x-0"}`}
       >
@@ -236,9 +234,10 @@ function AdminLayout() {
                         to={item.to as never}
                         title={collapsed ? item.label : undefined}
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                          ${active
-                            ? "bg-primary-foreground/15 text-white"
-                            : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                          ${
+                            active
+                              ? "bg-primary-foreground/15 text-white"
+                              : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
                           }
                           ${collapsed ? "justify-center" : ""}`}
                       >
@@ -309,8 +308,12 @@ function AdminLayout() {
         </div>
       </aside>
 
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main content area — offset by the fixed sidebar width on desktop */}
+      <div
+        className={`flex-1 flex flex-col min-w-0 transition-[margin] duration-200 ${
+          collapsed ? "lg:mr-16" : "lg:mr-64"
+        }`}
+      >
         {/* Top header — always visible */}
         <header className="h-14 sticky top-0 z-30 bg-surface border-b border-border flex items-center px-4 gap-3">
           {/* Mobile: hamburger */}
@@ -479,20 +482,23 @@ function AdminLayout() {
           {searchQuery.length === 0 && (
             <div className="mt-2 space-y-1">
               <p className="px-2 text-xs text-muted-foreground mb-2">الوصول السريع</p>
-              {navGroups.flatMap((g) => g.items).slice(0, 6).map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to as never}
-                    onClick={() => setSearchOpen(false)}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted text-sm"
-                  >
-                    <Icon className="h-4 w-4 text-muted-foreground" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
+              {navGroups
+                .flatMap((g) => g.items)
+                .slice(0, 6)
+                .map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to as never}
+                      onClick={() => setSearchOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted text-sm"
+                    >
+                      <Icon className="h-4 w-4 text-muted-foreground" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
             </div>
           )}
         </DialogContent>

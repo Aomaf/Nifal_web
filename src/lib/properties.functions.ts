@@ -2,6 +2,18 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+// Turn low-level Postgres RLS/permission errors into a clear Arabic message.
+// Other errors pass through unchanged.
+function propertyWriteError(error: { message: string; code?: string }): Error {
+  const isPermission =
+    error.code === "42501" || /row-level security|permission denied/i.test(error.message);
+  return new Error(
+    isPermission
+      ? "ليس لديك صلاحية لإدارة العقارات. تواصل مع المدير العام لمنحك صلاحية إدارة العقارات."
+      : error.message,
+  );
+}
+
 const ListFilters = z.object({
   city: z.string().optional(),
   type: z.string().optional(),
@@ -243,7 +255,7 @@ export const upsertProperty = createServerFn({ method: "POST" })
       .upsert(data as never)
       .select()
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw propertyWriteError(error);
     return row;
   });
 
@@ -252,7 +264,7 @@ export const deleteProperty = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("properties").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) throw propertyWriteError(error);
     return { ok: true };
   });
 
@@ -272,7 +284,7 @@ export const togglePropertyFlag = createServerFn({ method: "POST" })
       data.field === "is_published" ? { is_published: data.value } : { is_featured: data.value }
     ) as never;
     const { error } = await context.supabase.from("properties").update(update).eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) throw propertyWriteError(error);
     return { ok: true };
   });
 
