@@ -34,7 +34,8 @@ export const Route = createFileRoute("/properties")({
       { title: "العقارات | نِفال العقارية" },
       {
         name: "description",
-        content: "تصفح أفضل العقارات للبيع والإيجار في المملكة العربية السعودية.",
+        content:
+          "تصفّح عقارات للبيع والإيجار في مدن المملكة، مع تفاصيل واضحة تساعدك على المقارنة قبل التواصل.",
       },
     ],
   }),
@@ -67,7 +68,15 @@ function useRegaSearch() {
     }
   }
 
-  return { code, setCode: (v: string) => { setCode(v); setStatus("idle"); }, status, handleSearch };
+  return {
+    code,
+    setCode: (v: string) => {
+      setCode(v);
+      setStatus("idle");
+    },
+    status,
+    handleSearch,
+  };
 }
 
 function RegaSearch() {
@@ -99,9 +108,11 @@ function RegaSearch() {
           disabled={status === "loading" || !code.trim()}
           className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-primary px-5 text-[13px] font-medium text-primary-foreground transition hover:bg-primary/88 disabled:opacity-40"
         >
-          {status === "loading"
-            ? <Loader2 className="h-4 w-4 animate-spin" />
-            : <ArrowUpLeft className="h-4 w-4" />}
+          {status === "loading" ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ArrowUpLeft className="h-4 w-4" />
+          )}
           {status === "loading" ? "جارٍ البحث…" : "بحث"}
         </button>
       </form>
@@ -111,9 +122,7 @@ function RegaSearch() {
         </p>
       )}
       {status === "error" && (
-        <p className="text-[12px] text-destructive">
-          حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.
-        </p>
+        <p className="text-[12px] text-destructive">حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.</p>
       )}
     </div>
   );
@@ -159,7 +168,7 @@ function PropertiesPage() {
               ابحث عن العقار المناسب بهدوء ووضوح.
             </h1>
             <p className="max-w-[50ch] text-[14px] leading-[1.65] text-white/60">
-              فلترة سريعة، بطاقات نظيفة، ومعلومات أساسية تساعدك على المقارنة قبل التواصل.
+              فلترة سريعة ومعلومات أساسية لكل عقار تساعدك على المقارنة قبل التواصل.
             </p>
           </div>
 
@@ -188,8 +197,7 @@ function PropertiesPage() {
                     : "text-muted-foreground hover:text-foreground",
                 ].join(" ")}
               >
-                <Hash className="h-3.5 w-3.5" />
-                # معرف الإعلان
+                <Hash className="h-3.5 w-3.5" /># معرف الإعلان
               </button>
             </div>
 
@@ -219,7 +227,9 @@ function PropertiesPage() {
                   <SelectContent>
                     <SelectItem value="all">كل المدن</SelectItem>
                     {CITIES.map((city) => (
-                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -235,7 +245,9 @@ function PropertiesPage() {
                   <SelectContent>
                     <SelectItem value="all">كل الأنواع</SelectItem>
                     {Object.entries(PROPERTY_TYPE_LABELS).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -279,11 +291,7 @@ function PropertiesPage() {
       <div className="border-b border-border/60 bg-surface">
         <div className="container mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3.5 md:px-8">
           <p className="text-[13px] text-muted-foreground">
-            {isFetching
-              ? "جارٍ التحميل…"
-              : totalCount != null
-                ? `${totalCount} عقار`
-                : ""}
+            {isFetching ? "جارٍ التحميل…" : totalCount != null ? `${totalCount} عقار` : ""}
           </p>
           {/* Active filter pills */}
           <div className="flex flex-wrap items-center gap-1.5">
@@ -303,7 +311,10 @@ function PropertiesPage() {
               />
             )}
             {params.search && (
-              <FilterPill label={`"${params.search}"`} onRemove={() => update({ search: undefined })} />
+              <FilterPill
+                label={`"${params.search}"`}
+                onRemove={() => update({ search: undefined })}
+              />
             )}
           </div>
         </div>
@@ -331,7 +342,7 @@ function PropertiesPage() {
             <div className="mb-4 text-4xl">🔍</div>
             <h2 className="text-[22px] font-semibold text-foreground">لا توجد عقارات مطابقة</h2>
             <p className="mt-2 text-[14px] leading-[1.7] text-muted-foreground">
-              جرّب تعديل الفلاتر أو توسيع نطاق البحث.
+              جرّب توسيع نطاق البحث أو تغيير الفلاتر، أو أعد الضبط لعرض كل العقارات.
             </p>
             <Button
               variant="outline"
@@ -416,7 +427,10 @@ function RegaSearchDark() {
         <Input
           dir="ltr"
           value={code}
-          onChange={(e) => { setCode(e.target.value); setNotFound(false); }}
+          onChange={(e) => {
+            setCode(e.target.value);
+            setNotFound(false);
+          }}
           placeholder="أدخل معرف الإعلان (مثال: 1234567890)"
           className="h-11 rounded-lg border-white/12 bg-white/8 ps-9 text-[13px] text-white shadow-none placeholder:text-white/35 placeholder:text-right focus-visible:border-white/30 focus-visible:ring-0"
           disabled={loading}
@@ -433,7 +447,11 @@ function RegaSearchDark() {
         disabled={loading || !code.trim()}
         className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-primary px-5 text-[13px] font-medium text-primary-foreground transition hover:bg-primary/88 disabled:opacity-40"
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpLeft className="h-4 w-4" />}
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <ArrowUpLeft className="h-4 w-4" />
+        )}
         {loading ? "جارٍ البحث…" : "بحث"}
       </button>
     </form>

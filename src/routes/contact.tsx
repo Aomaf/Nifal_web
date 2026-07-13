@@ -36,7 +36,9 @@ function ContactPage() {
       <section className="surface-hero py-16">
         <div className="container mx-auto max-w-7xl px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">تواصل معنا</h1>
-          <p className="text-primary-foreground/80">نسعد بخدمتكم والإجابة على استفساراتكم</p>
+          <p className="text-primary-foreground/80">
+            أرسل استفسارك وسيتواصل معك فريق نِفال في أقرب وقت.
+          </p>
         </div>
       </section>
       <section className="container mx-auto max-w-6xl px-4 py-16 grid gap-8 md:grid-cols-2">

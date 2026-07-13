@@ -13,7 +13,16 @@ import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { PropertyCard, type PropertyCardData } from "@/components/site/property-card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpLeft, Building2, ChevronDown, ChevronUp, Eye, HandshakeIcon, MapPin, MessageCircle } from "lucide-react";
+import {
+  ArrowUpLeft,
+  Building2,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  HandshakeIcon,
+  MapPin,
+  MessageCircle,
+} from "lucide-react";
 import { buildWhatsAppUrl, COMPANY_WHATSAPP, formatNumber } from "@/lib/format";
 
 const featuredQO = queryOptions({
@@ -48,7 +57,7 @@ function Home() {
     { icon: Building2, label: "عقار متاح", value: stats.totalProperties },
     { icon: MapPin, label: "مدن نخدمها", value: stats.citiesServed },
     { icon: HandshakeIcon, label: "صفقة منجزة", value: stats.completedDeals },
-    { icon: Eye, label: "عميل سعيد", value: stats.happyClients },
+    { icon: Eye, label: "عميل نخدمه", value: stats.happyClients },
   ];
 
   const FALLBACK_IMAGES = [
@@ -138,8 +147,8 @@ function Home() {
                   <span className="block text-white/85">وقرارات أوضح.</span>
                 </h1>
                 <p className="mx-auto max-w-[320px] text-[15px] font-normal leading-[1.7] text-white/55 sm:mx-0 sm:max-w-[52ch] md:text-base">
-                  نعرض لك مشاريع وفرص عقارية في السعودية بواجهة هادئة، معلومات واضحة، وتجربة تواصل
-                  مباشرة مع فريق نِفال.
+                  عقارات ومشاريع في مدن المملكة، بمعلومات واضحة تساعدك على المقارنة، وتواصل مباشر مع
+                  فريق نِفال.
                 </p>
               </div>
               <div className="grid gap-3 pt-1 sm:flex sm:flex-wrap">
@@ -180,15 +189,16 @@ function Home() {
         <div className="container mx-auto max-w-7xl px-6 md:px-8">
           <div className="grid grid-cols-2 divide-x divide-x-reverse divide-border/60 md:grid-cols-4">
             {statItems.map((item) => (
-              <div key={item.label} className="flex items-center gap-4 px-6 py-7 first:ps-0 last:pe-0 md:py-9">
+              <div
+                key={item.label}
+                className="flex items-center gap-4 px-6 py-7 first:ps-0 last:pe-0 md:py-9"
+              >
                 <item.icon className="h-6 w-6 shrink-0 text-accent-dark" />
                 <div>
                   <div className="tabular text-[1.75rem] font-medium leading-none text-primary">
                     {formatNumber(item.value)}
                   </div>
-                  <div className="mt-1.5 text-[12px] text-muted-foreground">
-                    {item.label}
-                  </div>
+                  <div className="mt-1.5 text-[12px] text-muted-foreground">{item.label}</div>
                 </div>
               </div>
             ))}
@@ -254,7 +264,7 @@ function Home() {
       {bestSelling.length > 0 && (
         <PropertySection
           title="مشاريع عليها طلب واضح"
-          description="عقارات حققت اهتماما أعلى، مناسبة لمن يبحث عن مؤشرات طلب قبل التواصل."
+          description="عقارات لقيت اهتماماً أكبر من غيرها، تفيدك إن أردت أن ترى ما يطلبه الناس قبل أن تقرر."
           properties={bestSelling as PropertyCardData[]}
         />
       )}
@@ -419,7 +429,9 @@ function RegaSearchCard() {
 
   return (
     <div className="rounded-md border border-border bg-background p-6 shadow-md">
-      <h3 className="text-[17px] font-semibold leading-snug text-foreground text-right">ابحث بمعرف الإعلان</h3>
+      <h3 className="text-[17px] font-semibold leading-snug text-foreground text-right">
+        ابحث بمعرف الإعلان
+      </h3>
       <p className="mt-2 text-[13px] leading-[1.6] text-muted-foreground text-right">
         أدخل رقم معرف الإعلان العقاري للوصول مباشرة إلى تفاصيل العقار.
       </p>
@@ -427,7 +439,10 @@ function RegaSearchCard() {
         <Input
           dir="ltr"
           value={code}
-          onChange={(e) => { setCode(e.target.value); setStatus("idle"); }}
+          onChange={(e) => {
+            setCode(e.target.value);
+            setStatus("idle");
+          }}
           placeholder="مثال: 1234567890"
           className={[
             "h-10 rounded text-foreground placeholder:text-right placeholder:text-muted-foreground/50 focus-visible:ring-1",
@@ -494,11 +509,12 @@ function ValueSection({
         <div className="space-y-8 lg:col-start-2 lg:row-start-1">
           <div className="space-y-4 text-right">
             <h2 className="text-[2.4rem] font-semibold leading-[1.15] text-foreground md:text-[3rem]">
-              الأساسيات العقارية،<br />مرتبة بوضوح.
+              الأساسيات العقارية،
+              <br />
+              مرتبة بوضوح.
             </h2>
             <p className="text-[15px] leading-[1.75] text-muted-foreground">
-              تجربة نِفال تضع الصورة والمعلومة في المقدمة، مع تفاصيل عملية
-              تساعد العميل على المقارنة قبل التواصل.
+              نضع الصورة والمعلومة في المقدمة، مع تفاصيل عملية تساعدك على المقارنة قبل التواصل.
             </p>
           </div>
 
@@ -533,7 +549,9 @@ function ValueSection({
           {images.map((src, i) => (
             <img
               key={i}
-              src={src ?? "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80"}
+              src={
+                src ?? "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80"
+              }
               alt=""
               className={[
                 "absolute inset-0 h-full w-full object-cover transition-opacity duration-500",
@@ -547,7 +565,7 @@ function ValueSection({
           {/* Caption overlay — bottom start corner */}
           <div className="absolute bottom-20 inset-s-4 inset-e-4 rounded-xl bg-[rgba(18,15,14,0.82)] px-5 py-4 text-white backdrop-blur-sm">
             <p className="text-[14px] font-medium leading-[1.6] text-right">
-              تفاصيل واضحة تساعد العميل على اختيار العقار بثقة.
+              تفاصيل واضحة تساعدك على اختيار العقار بثقة.
             </p>
           </div>
 

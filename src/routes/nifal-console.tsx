@@ -185,7 +185,7 @@ function LoginPage() {
                   <Input type="password" dir="ltr" {...signupForm.register("password")} />
                 </div>
                 <Button type="submit" className="w-full btn-hero h-11" disabled={loading}>
-                  {loading ? "..." : "إنشاء حساب"}
+                  {loading ? "جارٍ الإنشاء..." : "إنشاء حساب"}
                 </Button>
               </form>
             </TabsContent>

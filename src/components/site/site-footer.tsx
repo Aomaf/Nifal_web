@@ -11,8 +11,8 @@ export function SiteFooter() {
             <NafalLogo />
           </div>
           <p className="text-sm text-primary-foreground/80 leading-relaxed">
-            شريكك الموثوق في عالم العقارات بالمملكة العربية السعودية. خدمات شاملة للبيع والإيجار
-            والاستثمار.
+            نِفال العقارية في المملكة العربية السعودية. تسويق عقاري، بيع وشراء، وتأجير، بمعلومات
+            واضحة وتواصل مباشر.
           </p>
         </div>
         <div>
@@ -55,7 +55,7 @@ export function SiteFooter() {
         <div>
           <h3 className="font-semibold mb-4">رؤيتنا</h3>
           <p className="text-sm text-primary-foreground/80 leading-relaxed">
-            نسعى لأن نكون الخيار الأول للعملاء في تقديم الحلول العقارية المبتكرة والموثوقة.
+            أن نكون الخيار الأول لمن يبحث عن قرار عقاري واضح يثق به.
           </p>
         </div>
       </div>
