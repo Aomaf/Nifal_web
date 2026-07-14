@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -69,6 +69,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { PROPERTY_TYPE_LABELS } from "@/lib/format";
+import { ATTRIBUTE_FIELDS, TYPE_FIELDS } from "@/lib/property-fields";
 import { SarAmount } from "@/components/ui/sar-icon";
 
 // Download rows as CSV file
@@ -150,6 +151,11 @@ const schema = z.object({
     "commercial_land",
     "industrial_land",
     "building",
+    "floor",
+    "istiraha",
+    "chalet",
+    "house",
+    "farm",
   ]),
   purpose: z.enum(["sale", "rent"]),
   price: z.coerce.number().nonnegative(),
@@ -165,6 +171,8 @@ const schema = z.object({
   hero_video_url: z.string().url("رابط غير صالح").optional().nullable().or(z.literal("")),
   tags: z.string().default(""),
   is_archived: z.boolean().default(false),
+  // Type-specific fields (see src/lib/property-fields.ts).
+  attributes: z.record(z.string(), z.union([z.string(), z.number()])).default({}),
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -604,6 +612,7 @@ function AdminProperties() {
       hero_video_url: (p.hero_video_url as string) ?? null,
       tags: ((p.tags as string[]) ?? []).join(", "),
       is_archived: !!(p.is_archived as boolean),
+      attributes: (p.attributes as Record<string, string | number>) ?? {},
     });
     setOpen(true);
   };
@@ -702,7 +711,10 @@ function AdminProperties() {
               {/* Cover image */}
               <div className="relative h-20 w-28 rounded-lg bg-muted overflow-hidden shrink-0">
                 <img
-                  src={cover ?? `https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=60`}
+                  src={
+                    cover ??
+                    `https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=60`
+                  }
                   alt=""
                   className="w-full h-full object-cover"
                 />
@@ -945,15 +957,17 @@ function PropertyDialog({
   const [publishError, setPublishError] = useState<string | null>(null);
 
   // Load existing images when editing
-  const { isLoading: imagesLoading } = useQuery({
+  const { data: loadedImages, isLoading: imagesLoading } = useQuery({
     queryKey: ["property-images", initial?.id],
     queryFn: () => listPropertyImages({ data: { propertyId: initial!.id! } }),
     enabled: !!initial?.id && open,
-    select: (rows) => {
-      setSavedImages(rows);
-      return rows;
-    },
   });
+
+  // Seed the locally-editable saved images once the query resolves.
+  // (Must NOT setState inside `select` — that runs every render and loops → React #301.)
+  useEffect(() => {
+    if (loadedImages) setSavedImages(loadedImages);
+  }, [loadedImages]);
 
   // Reset staged images when dialog opens/closes
   const handleOpenChange = (v: boolean) => {
@@ -981,6 +995,7 @@ function PropertyDialog({
       hero_video_url: null,
       tags: "",
       is_archived: false,
+      attributes: {},
     }) as FormValues,
   });
 
@@ -997,12 +1012,24 @@ function PropertyDialog({
       }
       setPublishError(null);
 
-      // 1. Save property metadata
+      // 1. Save property metadata.
+      // Prune attributes to only the keys this type uses (dropping stale values
+      // left over from a previous type), and exclude bedrooms/bathrooms which
+      // persist as their own columns.
+      const allowedKeys = (TYPE_FIELDS[v.type] ?? []).filter(
+        (k) => k !== "bedrooms" && k !== "bathrooms",
+      );
+      const cleanAttributes: Record<string, string | number> = {};
+      for (const k of allowedKeys) {
+        const val = (v.attributes as Record<string, string | number>)?.[k];
+        if (val != null && val !== "") cleanAttributes[k] = val;
+      }
       const row = await upsertProperty({
         data: {
           ...v,
           hero_video_url: v.hero_video_url || null,
           tags: parseTags(v.tags),
+          attributes: cleanAttributes,
         },
       });
 
@@ -1164,33 +1191,84 @@ function PropertyDialog({
                   <Input type="number" {...form.register("area_sqm")} />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <Label>غرف النوم</Label>
-                  <Input type="number" {...form.register("bedrooms")} />
-                </div>
-                <div>
-                  <Label>الحمامات</Label>
-                  <Input type="number" {...form.register("bathrooms")} />
-                </div>
-                <div>
-                  <Label>الحالة</Label>
-                  <Select
-                    value={form.watch("status")}
-                    onValueChange={(v) => form.setValue("status", v as FormValues["status"])}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="available">متاح</SelectItem>
-                      <SelectItem value="sold">مباع</SelectItem>
-                      <SelectItem value="rented">مؤجر</SelectItem>
-                      <SelectItem value="reserved">محجوز</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div>
+                <Label>الحالة</Label>
+                <Select
+                  value={form.watch("status")}
+                  onValueChange={(v) => form.setValue("status", v as FormValues["status"])}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="available">متاح</SelectItem>
+                    <SelectItem value="sold">مباع</SelectItem>
+                    <SelectItem value="rented">مؤجر</SelectItem>
+                    <SelectItem value="reserved">محجوز</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Type-specific fields — driven by TYPE_FIELDS (src/lib/property-fields.ts).
+                  Changes when the "type" select changes. bedrooms/bathrooms are real
+                  columns; everything else lives in the `attributes` JSONB object. */}
+              {(TYPE_FIELDS[form.watch("type")] ?? []).length > 0 && (
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                  {(TYPE_FIELDS[form.watch("type")] ?? []).map((key) => {
+                    const field = ATTRIBUTE_FIELDS[key];
+                    if (!field) return null;
+                    const isColumn = key === "bedrooms" || key === "bathrooms";
+                    const attrs = (form.watch("attributes") ?? {}) as Record<
+                      string,
+                      string | number
+                    >;
+                    const value = isColumn
+                      ? (form.watch(key as "bedrooms" | "bathrooms") ?? "")
+                      : (attrs[key] ?? "");
+                    const setValue = (v: string) => {
+                      if (isColumn) {
+                        form.setValue(
+                          key as "bedrooms" | "bathrooms",
+                          v === "" ? null : (Number(v) as never),
+                        );
+                      } else {
+                        const next = {
+                          ...((form.watch("attributes") ?? {}) as Record<string, string | number>),
+                        };
+                        if (v === "") delete next[key];
+                        else next[key] = field.kind === "number" ? Number(v) : v;
+                        form.setValue("attributes", next);
+                      }
+                    };
+                    return (
+                      <div key={key}>
+                        <Label>{field.label}</Label>
+                        {field.kind === "select" ? (
+                          <Select value={String(value)} onValueChange={setValue}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="—" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {field.options?.map((opt) => (
+                                <SelectItem key={opt} value={opt}>
+                                  {opt}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Input
+                            type="number"
+                            step={field.integer ? "1" : "any"}
+                            value={String(value)}
+                            onChange={(e) => setValue(e.target.value)}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               <div>
                 <Label>الوصف</Label>
                 <Textarea rows={4} {...form.register("description")} />

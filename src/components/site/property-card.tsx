@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, BedDouble, Bath, Maximize2 } from "lucide-react";
+import { MapPin, BedDouble, Bath, Maximize2, Ruler } from "lucide-react";
 import { PROPERTY_TYPE_LABELS, PURPOSE_LABELS } from "@/lib/format";
+import { CARD_FIELDS, ATTRIBUTE_FIELDS, formatAttributeValue } from "@/lib/property-fields";
 import { SarAmount } from "@/components/ui/sar-icon";
 
 const PROPERTY_FALLBACKS = [
@@ -33,7 +34,14 @@ export type PropertyCardData = {
   bathrooms: number | null;
   is_featured: boolean | null;
   sold_percentage?: number | null;
+  attributes?: Record<string, string | number> | null;
   property_images?: Img[] | null;
+};
+
+const CARD_ICONS: Record<string, typeof MapPin> = {
+  bedrooms: BedDouble,
+  bathrooms: Bath,
+  street_width: Ruler,
 };
 
 export function PropertyCard({ p }: { p: PropertyCardData }) {
@@ -41,10 +49,21 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
     .slice()
     .sort((a, b) => Number(b.is_primary) - Number(a.is_primary));
   const cover = imgs[0]?.image_url;
+  // Area is always shown; the rest come from the type's compact card fields.
+  const attrs = p.attributes ?? {};
   const meta = [
     p.area_sqm ? { icon: Maximize2, label: `${p.area_sqm} م²` } : null,
-    p.bedrooms != null ? { icon: BedDouble, label: `${p.bedrooms} غرف` } : null,
-    p.bathrooms != null ? { icon: Bath, label: `${p.bathrooms} دورات` } : null,
+    ...(CARD_FIELDS[p.type] ?? []).map((key) => {
+      const icon = CARD_ICONS[key] ?? MapPin;
+      if (key === "bedrooms")
+        return p.bedrooms != null ? { icon, label: `${p.bedrooms} غرف` } : null;
+      if (key === "bathrooms")
+        return p.bathrooms != null ? { icon, label: `${p.bathrooms} دورات` } : null;
+      const val = formatAttributeValue(key, attrs[key]);
+      return val != null
+        ? { icon, label: `${ATTRIBUTE_FIELDS[key]?.label ?? ""} ${val}`.trim() }
+        : null;
+    }),
   ].filter(Boolean) as { icon: typeof MapPin; label: string }[];
 
   return (

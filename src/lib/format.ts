@@ -11,13 +11,18 @@ export function formatNumber(value: number | null | undefined): string {
 export const PROPERTY_TYPE_LABELS: Record<string, string> = {
   villa: "فيلا",
   apartment: "شقة",
+  house: "بيت",
+  floor: "دور",
+  building: "عمارة",
+  chalet: "شاليه",
+  istiraha: "استراحة",
   office: "مكتب",
   shop: "محل تجاري",
   industrial: "صناعي",
   residential_land: "أرض سكنية",
   commercial_land: "أرض تجارية",
   industrial_land: "أرض صناعية",
-  building: "عمارة",
+  farm: "مزرعة",
 };
 
 export const PURPOSE_LABELS: Record<string, string> = {
