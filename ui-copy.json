@@ -122,13 +122,18 @@
   "property_types": {
     "villa": "فيلا",
     "apartment": "شقة",
+    "house": "بيت",
+    "floor": "دور",
     "office": "مكتب",
     "shop": "محل تجاري",
     "industrial": "صناعي",
     "residential_land": "أرض سكنية",
     "commercial_land": "أرض تجارية",
     "industrial_land": "أرض صناعية",
-    "building": "عمارة"
+    "building": "عمارة",
+    "chalet": "شاليه",
+    "istiraha": "استراحة",
+    "farm": "مزرعة"
   },
 
   "property_purposes": {

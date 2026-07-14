@@ -35,7 +35,7 @@ export const listPublicProperties = createServerFn({ method: "GET" })
     let q = supabaseAdmin
       .from("properties")
       .select(
-        "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,views_count,created_at, property_images(image_url,is_primary,sort_order)",
+        "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,views_count,created_at,attributes, property_images(image_url,is_primary,sort_order)",
         { count: "exact" },
       )
       .eq("is_published", true);
@@ -229,6 +229,11 @@ const PropertyInput = z.object({
     "commercial_land",
     "industrial_land",
     "building",
+    "floor",
+    "istiraha",
+    "chalet",
+    "house",
+    "farm",
   ]),
   purpose: z.enum(["sale", "rent"]),
   price: z.number().nonnegative(),
@@ -244,6 +249,9 @@ const PropertyInput = z.object({
   hero_video_url: z.string().url().optional().or(z.literal("")).nullable(),
   tags: z.array(z.string()).default([]),
   is_archived: z.boolean().default(false),
+  // Type-specific fields (see src/lib/property-fields.ts). Values are strings
+  // (select) or numbers; nulls are pruned client-side before submit.
+  attributes: z.record(z.string(), z.union([z.string(), z.number()])).default({}),
 });
 
 export const upsertProperty = createServerFn({ method: "POST" })

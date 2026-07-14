@@ -23,7 +23,7 @@ const search = z.object({
   type: z.string().optional(),
   purpose: z.enum(["sale", "rent"]).optional(),
   search: z.string().optional(),
-  sort: z.enum(["newest", "price_asc", "price_desc", "most_viewed"]).default("newest"),
+  sort: z.enum(["price_asc", "price_desc", "most_viewed"]).default("price_asc"),
   page: z.number().int().min(1).default(1),
 });
 
@@ -275,7 +275,6 @@ function PropertiesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="newest">الأحدث</SelectItem>
                     <SelectItem value="price_asc">السعر: من الأقل</SelectItem>
                     <SelectItem value="price_desc">السعر: من الأعلى</SelectItem>
                     <SelectItem value="most_viewed">الأكثر مشاهدة</SelectItem>
@@ -347,7 +346,7 @@ function PropertiesPage() {
             <Button
               variant="outline"
               className="mt-6 h-10 rounded-lg px-6 text-[13px]"
-              onClick={() => navigate({ search: { sort: "newest", page: 1 } })}
+              onClick={() => navigate({ search: { sort: "price_asc", page: 1 } })}
             >
               إعادة ضبط البحث
             </Button>

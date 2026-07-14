@@ -28,6 +28,7 @@ import {
   STATUS_LABELS,
   formatNumber,
 } from "@/lib/format";
+import { ATTRIBUTE_FIELDS, TYPE_FIELDS, formatAttributeValue } from "@/lib/property-fields";
 import { SarAmount, SarIcon } from "@/components/ui/sar-icon";
 
 const DETAIL_FALLBACKS = [
@@ -98,9 +99,7 @@ function PropertyDetail() {
   let idHash = 0;
   for (let i = 0; i < data.id.length; i++) idHash = (idHash * 31 + data.id.charCodeAt(i)) >>> 0;
   const displayImages =
-    images.length > 0
-      ? images
-      : [DETAIL_FALLBACKS[idHash % DETAIL_FALLBACKS.length]];
+    images.length > 0 ? images : [DETAIL_FALLBACKS[idHash % DETAIL_FALLBACKS.length]];
 
   const waMessage = `السلام عليكم، أنا مهتم بهذا العقار:\n${data.title}${data.city ? ` - ${data.city}` : ""}${data.rega_ad_code ? `\nرقم الإعلان: ${data.rega_ad_code}` : ""}\n\nأرجو التواصل معي.`;
   const waUrl = buildWhatsAppUrl(COMPANY_WHATSAPP, waMessage);
@@ -143,7 +142,9 @@ function PropertyDetail() {
           {displayImages.length > 1 && (
             <>
               <button
-                onClick={() => setActiveIndex((i) => (i - 1 + displayImages.length) % displayImages.length)}
+                onClick={() =>
+                  setActiveIndex((i) => (i - 1 + displayImages.length) % displayImages.length)
+                }
                 className="absolute end-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur transition hover:bg-black/60"
                 aria-label="الصورة السابقة"
               >
@@ -174,9 +175,7 @@ function PropertyDetail() {
             <span
               className={[
                 "rounded-full px-3 py-1 text-[12px] font-medium",
-                isAvailable
-                  ? "bg-green-600/90 text-white"
-                  : "bg-black/50 text-white backdrop-blur",
+                isAvailable ? "bg-green-600/90 text-white" : "bg-black/50 text-white backdrop-blur",
               ].join(" ")}
             >
               {statusLabel}
@@ -193,7 +192,9 @@ function PropertyDetail() {
                 onClick={() => setActiveIndex(i)}
                 className={[
                   "h-14 w-20 shrink-0 overflow-hidden rounded border-2 transition",
-                  i === activeIndex ? "border-primary" : "border-transparent opacity-60 hover:opacity-90",
+                  i === activeIndex
+                    ? "border-primary"
+                    : "border-transparent opacity-60 hover:opacity-90",
                 ].join(" ")}
               >
                 <img src={src} alt="" className="h-full w-full object-cover" />
@@ -207,9 +208,13 @@ function PropertyDetail() {
       <div className="border-b border-border/60 bg-surface">
         <div className="container mx-auto max-w-7xl px-6 py-3 md:px-8">
           <nav className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
-            <Link to="/" className="hover:text-foreground">الرئيسية</Link>
+            <Link to="/" className="hover:text-foreground">
+              الرئيسية
+            </Link>
             <ChevronLeft className="h-3 w-3" />
-            <Link to="/properties" className="hover:text-foreground">العقارات</Link>
+            <Link to="/properties" className="hover:text-foreground">
+              العقارات
+            </Link>
             <ChevronLeft className="h-3 w-3" />
             <span className="text-foreground line-clamp-1">{data.title}</span>
           </nav>
@@ -278,27 +283,70 @@ function PropertyDetail() {
               </div>
               <div className="grid grid-cols-2 gap-px bg-border md:grid-cols-3">
                 {[
-                  data.area_sqm != null && { label: "المساحة", value: `${formatNumber(data.area_sqm)} م²`, icon: Maximize2 },
-                  data.bedrooms != null && { label: "غرف النوم", value: formatNumber(data.bedrooms), icon: BedDouble },
-                  data.bathrooms != null && { label: "الحمامات", value: formatNumber(data.bathrooms), icon: Bath },
+                  data.area_sqm != null && {
+                    label: "المساحة",
+                    value: `${formatNumber(data.area_sqm)} م²`,
+                    icon: Maximize2,
+                  },
                   { label: "النوع", value: typeLabel, icon: null },
                   { label: "الغرض", value: purposeLabel, icon: null },
                   { label: "الحالة", value: statusLabel, icon: null },
-                  data.list_date && { label: "تاريخ الإدراج", value: data.list_date, icon: Calendar },
-                  data.sold_percentage != null && { label: "نسبة المبيع", value: `${data.sold_percentage}%`, icon: null },
-                ].filter(Boolean).map((spec) => {
-                  if (!spec) return null;
-                  const s = spec as { label: string; value: string; icon: typeof Maximize2 | null };
-                  return (
-                    <div key={s.label} className="flex items-center gap-3 bg-surface px-5 py-4">
-                      {s.icon && <s.icon className="h-4 w-4 shrink-0 text-primary" />}
-                      <div>
-                        <p className="text-[11px] text-muted-foreground">{s.label}</p>
-                        <p className="text-[14px] font-medium text-foreground">{s.value}</p>
+                  // Type-specific fields, in the order defined for this type.
+                  // bedrooms/bathrooms come from their columns; the rest from `attributes`.
+                  ...(TYPE_FIELDS[data.type as string] ?? []).map((key) => {
+                    const field = ATTRIBUTE_FIELDS[key];
+                    if (!field) return false;
+                    const icon = key === "bedrooms" ? BedDouble : key === "bathrooms" ? Bath : null;
+                    if (key === "bedrooms")
+                      return (
+                        data.bedrooms != null && {
+                          label: field.label,
+                          value: formatNumber(data.bedrooms),
+                          icon,
+                        }
+                      );
+                    if (key === "bathrooms")
+                      return (
+                        data.bathrooms != null && {
+                          label: field.label,
+                          value: formatNumber(data.bathrooms),
+                          icon,
+                        }
+                      );
+                    const attributes = (data as { attributes?: Record<string, string | number> })
+                      .attributes;
+                    const val = formatAttributeValue(key, attributes?.[key]);
+                    return val != null && { label: field.label, value: val, icon };
+                  }),
+                  data.list_date && {
+                    label: "تاريخ الإدراج",
+                    value: data.list_date,
+                    icon: Calendar,
+                  },
+                  data.sold_percentage != null && {
+                    label: "نسبة المبيع",
+                    value: `${data.sold_percentage}%`,
+                    icon: null,
+                  },
+                ]
+                  .filter(Boolean)
+                  .map((spec) => {
+                    if (!spec) return null;
+                    const s = spec as {
+                      label: string;
+                      value: string;
+                      icon: typeof Maximize2 | null;
+                    };
+                    return (
+                      <div key={s.label} className="flex items-center gap-3 bg-surface px-5 py-4">
+                        {s.icon && <s.icon className="h-4 w-4 shrink-0 text-primary" />}
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">{s.label}</p>
+                          <p className="text-[14px] font-medium text-foreground">{s.value}</p>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             </div>
 
@@ -318,7 +366,10 @@ function PropertyDetail() {
                 <h2 className="text-[17px] font-semibold text-foreground">المميزات والخدمات</h2>
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                   {(data.property_amenities as { id: string; amenity_name: string }[]).map((a) => (
-                    <div key={a.id} className="flex items-center gap-2.5 text-[14px] text-foreground">
+                    <div
+                      key={a.id}
+                      className="flex items-center gap-2.5 text-[14px] text-foreground"
+                    >
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
                       {a.amenity_name}
                     </div>
@@ -354,9 +405,7 @@ function PropertyDetail() {
                 <p className="mt-1 text-[2.25rem] font-bold leading-none text-primary tabular">
                   <SarAmount value={data.price} />
                 </p>
-                {!isSale && (
-                  <p className="mt-1 text-[12px] text-muted-foreground">سنوياً</p>
-                )}
+                {!isSale && <p className="mt-1 text-[12px] text-muted-foreground">سنوياً</p>}
               </div>
 
               <div className="border-t border-border pt-4" />
@@ -396,7 +445,9 @@ function PropertyDetail() {
                 {data.area_sqm != null && (
                   <div className="flex items-center justify-between text-[13px]">
                     <span className="text-muted-foreground">المساحة</span>
-                    <span className="font-medium text-foreground">{formatNumber(data.area_sqm)} م²</span>
+                    <span className="font-medium text-foreground">
+                      {formatNumber(data.area_sqm)} م²
+                    </span>
                   </div>
                 )}
                 {data.bedrooms != null && (
