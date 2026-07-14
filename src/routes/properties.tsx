@@ -118,7 +118,7 @@ function RegaSearch() {
       </form>
       {status === "not_found" && (
         <p className="text-[12px] text-destructive">
-          لم يُعثر على عقار بهذا المعرف. تحقق من الرقم وحاول مجدداً.
+          لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.
         </p>
       )}
       {status === "error" && (
@@ -165,7 +165,7 @@ function PropertiesPage() {
           {/* Headline */}
           <div className="space-y-3 text-right">
             <h1 className="text-[2rem] font-semibold leading-[1.12] text-white md:text-[2.65rem]">
-              ابحث عن العقار المناسب بهدوء ووضوح.
+              ابحث عن العقار المناسب بوضوح.
             </h1>
             <p className="max-w-[50ch] text-[14px] leading-[1.65] text-white/60">
               فلترة سريعة ومعلومات أساسية لكل عقار تساعدك على المقارنة قبل التواصل.
@@ -275,7 +275,7 @@ function PropertiesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="price_asc">السعر: من الأقل</SelectItem>
+                    <SelectItem value="price_asc">السعر: من الأقل للأعلى</SelectItem>
                     <SelectItem value="price_desc">السعر: من الأعلى</SelectItem>
                     <SelectItem value="most_viewed">الأكثر مشاهدة</SelectItem>
                   </SelectContent>
@@ -339,7 +339,7 @@ function PropertiesPage() {
         {data && data.rows.length === 0 && (
           <div className="mx-auto max-w-sm rounded-xl border border-border bg-surface px-8 py-16 text-center">
             <div className="mb-4 text-4xl">🔍</div>
-            <h2 className="text-[22px] font-semibold text-foreground">لا توجد عقارات مطابقة</h2>
+            <h2 className="text-[22px] font-semibold text-foreground">لا توجد نتائج</h2>
             <p className="mt-2 text-[14px] leading-[1.7] text-muted-foreground">
               جرّب توسيع نطاق البحث أو تغيير الفلاتر، أو أعد الضبط لعرض كل العقارات.
             </p>
@@ -348,7 +348,7 @@ function PropertiesPage() {
               className="mt-6 h-10 rounded-lg px-6 text-[13px]"
               onClick={() => navigate({ search: { sort: "price_asc", page: 1 } })}
             >
-              إعادة ضبط البحث
+              إعادة ضبط
             </Button>
           </div>
         )}

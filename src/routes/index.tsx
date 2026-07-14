@@ -91,7 +91,7 @@ function Home() {
   const valueItems = [
     {
       icon: "shield",
-      title: "شفافية العرض",
+      title: "شفافية حقيقية",
       text: "السعر، الموقع، وحالة العقار تظهر بصورة مباشرة دون مبالغة.",
     },
     {
@@ -144,7 +144,7 @@ function Home() {
               <div className="space-y-5">
                 <h1 className="text-[2.2rem] font-semibold leading-[1.12] tracking-[-0.01em] sm:text-[2.8rem] lg:text-[3.2rem]">
                   <span className="block">عقارات مختارة بعناية،</span>
-                  <span className="block text-white/85">وقرارات أوضح.</span>
+                  <span className="block text-white/85">وقرارات واضحة.</span>
                 </h1>
                 <p className="mx-auto max-w-[320px] text-[15px] font-normal leading-[1.7] text-white/55 sm:mx-0 sm:max-w-[52ch] md:text-base">
                   عقارات ومشاريع في مدن المملكة، بمعلومات واضحة تساعدك على المقارنة، وتواصل مباشر مع
@@ -237,7 +237,7 @@ function Home() {
       </section>
 
       <PropertySection
-        title="اختيارات تناسب السكن والاستثمار"
+        title="عقارات موثوقة للسكن والاستثمار"
         description="عقارات منتقاة من فريق نِفال، مرتبة بصورة واضحة حتى تقارن بين السعر، الموقع، والمساحة بسرعة."
         properties={featured.rows as PropertyCardData[]}
       />
@@ -456,7 +456,7 @@ function RegaSearchCard() {
         />
         {status === "not_found" && (
           <p className="text-[12px] text-destructive text-right">
-            لم يُعثر على عقار بهذا المعرف. تحقق من الرقم وحاول مجدداً.
+            لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.
           </p>
         )}
         {status === "error" && (
@@ -511,7 +511,7 @@ function ValueSection({
             <h2 className="text-[2.4rem] font-semibold leading-[1.15] text-foreground md:text-[3rem]">
               الأساسيات العقارية،
               <br />
-              مرتبة بوضوح.
+              واضحة ومرتبة.
             </h2>
             <p className="text-[15px] leading-[1.75] text-muted-foreground">
               نضع الصورة والمعلومة في المقدمة، مع تفاصيل عملية تساعدك على المقارنة قبل التواصل.

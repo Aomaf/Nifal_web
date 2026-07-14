@@ -45,9 +45,9 @@ function ContactPage() {
         <div className="card-elegant p-6 space-y-4">
           <h2 className="text-xl font-bold">معلومات التواصل</h2>
           {[
-            { icon: Phone, label: "الهاتف", value: "920000000" },
-            { icon: MessageCircle, label: "واتساب", value: "+966 50 000 0000" },
-            { icon: Mail, label: "البريد", value: "info@nafal.sa" },
+            { icon: Phone, label: "الهاتف", value: "0550052120" },
+            { icon: MessageCircle, label: "واتساب", value: "+966 55 005 2120" },
+            { icon: Mail, label: "البريد", value: "nafal.com.sa@gmail.com" },
             { icon: MapPin, label: "العنوان", value: "الرياض، المملكة العربية السعودية" },
             { icon: Clock, label: "ساعات العمل", value: "السبت - الخميس: 9 صباحاً - 9 مساءً" },
           ].map((i) => (

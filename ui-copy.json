@@ -18,9 +18,9 @@
     "link_about": "من نحن",
     "link_contact": "تواصل معنا",
     "contact_heading": "تواصل معنا",
-    "contact_phone": "920000000",
+    "contact_phone": "0550052120",
     "contact_whatsapp": "واتساب",
-    "contact_email": "info@nafal.sa",
+    "contact_email": "nafal.com.sa@gmail.com",
     "contact_address": "الرياض، المملكة العربية السعودية",
     "vision_heading": "رؤيتنا",
     "vision_text": "أن نكون الخيار الأول لمن يبحث عن قرار عقاري واضح يثق به.",
@@ -29,7 +29,7 @@
 
   "home_page": {
     "hero_headline_line1": "عقارات مختارة بعناية،",
-    "hero_headline_line2": "وقرارات أوضح.",
+    "hero_headline_line2": "وقرارات واضحة.",
     "hero_subheading": "عقارات ومشاريع في مدن المملكة، بمعلومات واضحة تساعدك على المقارنة، وتواصل مباشر مع فريق نِفال.",
     "hero_cta_browse": "تصفح العقارات",
     "hero_cta_whatsapp": "تواصل واتساب",
@@ -44,7 +44,7 @@
     "nav_card_latest": "أحدث المشاريع",
     "nav_card_contact": "تواصل معنا",
 
-    "section_featured_title": "اختيارات تناسب السكن والاستثمار",
+    "section_featured_title": "عقارات موثوقة للسكن والاستثمار",
     "section_featured_description": "عقارات منتقاة من فريق نِفال، مرتبة بصورة واضحة حتى تقارن بين السعر، الموقع، والمساحة بسرعة.",
     "section_latest_title": "فرص أضيفت حديثا",
     "section_latest_description": "تابع أحدث العقارات المتاحة في المدن التي نخدمها، مع تفاصيل مركزة وصور تقود القرار.",
@@ -53,9 +53,9 @@
     "section_view_all_button": "عرض الكل",
 
     "value_section_headline_line1": "الأساسيات العقارية،",
-    "value_section_headline_line2": "مرتبة بوضوح.",
+    "value_section_headline_line2": "واضحة ومرتبة.",
     "value_section_subheading": "نضع الصورة والمعلومة في المقدمة، مع تفاصيل عملية تساعدك على المقارنة قبل التواصل.",
-    "value_item_transparency_title": "شفافية العرض",
+    "value_item_transparency_title": "شفافية حقيقية",
     "value_item_transparency_text": "السعر، الموقع، وحالة العقار تظهر بصورة مباشرة دون مبالغة.",
     "value_item_filter_title": "فرز سريع",
     "value_item_filter_text": "تصفية حسب المدينة، النوع، الغرض، والأحدث أو السعر.",
@@ -77,14 +77,14 @@
     "rega_search_placeholder": "مثال: 1234567890",
     "rega_search_button": "بحث",
     "rega_search_loading": "جارٍ البحث…",
-    "rega_search_not_found": "لم يُعثر على عقار بهذا المعرف. تحقق من الرقم وحاول مجدداً.",
+    "rega_search_not_found": "لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.",
     "rega_search_error": "حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى."
   },
 
   "properties_page": {
     "page_title": "العقارات | نِفال العقارية",
     "page_description": "تصفّح عقارات للبيع والإيجار في مدن المملكة، مع تفاصيل واضحة تساعدك على المقارنة قبل التواصل.",
-    "hero_headline": "ابحث عن العقار المناسب بهدوء ووضوح.",
+    "hero_headline": "ابحث عن العقار المناسب بوضوح.",
     "hero_subheading": "فلترة سريعة ومعلومات أساسية لكل عقار تساعدك على المقارنة قبل التواصل.",
 
     "search_mode_title": "بحث بالعنوان",
@@ -97,7 +97,7 @@
     "filter_purpose_sale": "للبيع",
     "filter_purpose_rent": "للإيجار",
     "sort_newest": "الأحدث",
-    "sort_price_asc": "السعر: من الأقل",
+    "sort_price_asc": "السعر: من الأقل للأعلى",
     "sort_price_desc": "السعر: من الأعلى",
     "sort_most_viewed": "الأكثر مشاهدة",
 
@@ -105,9 +105,9 @@
     "results_count_suffix": "عقار",
 
     "empty_state_emoji": "🔍",
-    "empty_state_title": "لا توجد عقارات مطابقة",
+    "empty_state_title": "لا توجد نتائج",
     "empty_state_description": "جرّب توسيع نطاق البحث أو تغيير الفلاتر، أو أعد الضبط لعرض كل العقارات.",
-    "empty_state_reset_button": "إعادة ضبط البحث",
+    "empty_state_reset_button": "إعادة ضبط",
 
     "pagination_prev": "السابق",
     "pagination_next": "التالي",
@@ -115,7 +115,7 @@
 
     "rega_search_button": "بحث",
     "rega_search_loading": "جارٍ البحث…",
-    "rega_search_not_found": "لم يُعثر على عقار بهذا المعرف. تحقق من الرقم وحاول مجدداً.",
+    "rega_search_not_found": "لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.",
     "rega_search_error": "حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى."
   },
 
@@ -179,11 +179,11 @@
     "hero_subheading": "أرسل استفسارك وسيتواصل معك فريق نِفال في أقرب وقت.",
     "contact_info_heading": "معلومات التواصل",
     "label_phone": "الهاتف",
-    "phone_value": "920000000",
+    "phone_value": "0550052120",
     "label_whatsapp": "واتساب",
-    "whatsapp_value": "+966 50 000 0000",
+    "whatsapp_value": "+966 55 005 2120",
     "label_email": "البريد",
-    "email_value": "info@nafal.sa",
+    "email_value": "nafal.com.sa@gmail.com",
     "label_address": "العنوان",
     "address_value": "الرياض، المملكة العربية السعودية",
     "label_hours": "ساعات العمل",
