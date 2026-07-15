@@ -19,7 +19,7 @@ const signupSchema = loginSchema.extend({ full_name: z.string().min(2, "الاس
 const adminUrl = import.meta.env.VITE_ADMIN_URL ?? "/admin";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "تسجيل الدخول | نِفال العقارية" }] }),
+  head: () => ({ meta: [{ title: "تسجيل الدخول | نفال العقارية" }] }),
   component: LoginPage,
 });
 

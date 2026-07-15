@@ -12,7 +12,7 @@ import { buildWhatsAppUrl, COMPANY_WHATSAPP } from "@/lib/format";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "تواصل معنا | نِفال العقارية" },
+      { title: "تواصل معنا | نفال العقارية" },
       {
         name: "description",
         content: "تواصل مع فريق نِفال العقارية للاستفسار عن العقارات والخدمات.",

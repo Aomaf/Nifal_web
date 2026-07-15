@@ -31,7 +31,7 @@ export const Route = createFileRoute("/properties")({
   validateSearch: search,
   head: () => ({
     meta: [
-      { title: "العقارات | نِفال العقارية" },
+      { title: "العقارات | نفال العقارية" },
       {
         name: "description",
         content:

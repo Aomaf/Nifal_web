@@ -143,12 +143,10 @@ function Home() {
             <div className="max-w-4xl space-y-8 text-center sm:text-right">
               <div className="space-y-5">
                 <h1 className="text-[2.2rem] font-semibold leading-[1.12] tracking-[-0.01em] sm:text-[2.8rem] lg:text-[3.2rem]">
-                  <span className="block">عقارات مختارة بعناية،</span>
-                  <span className="block text-white/85">وقرارات واضحة.</span>
+                  بداية موثوقة لرحلتك العقارية
                 </h1>
                 <p className="mx-auto max-w-[320px] text-[15px] font-normal leading-[1.7] text-white/55 sm:mx-0 sm:max-w-[52ch] md:text-base">
-                  عقارات ومشاريع في مدن المملكة، بمعلومات واضحة تساعدك على المقارنة، وتواصل مباشر مع
-                  فريق نِفال.
+                  مشاريع وعقارات مختارة، نعرضها بمعلومات واضحة وتفاصيل دقيقة، لتتخذ قرارك بثقة.
                 </p>
               </div>
               <div className="grid gap-3 pt-1 sm:flex sm:flex-wrap">
@@ -274,10 +272,11 @@ function Home() {
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
             <div>
               <h2 className="mt-4 text-3xl font-medium leading-[1.25] md:text-[2rem]">
-                اختر العقار، واترك التفاصيل علينا.
+                كل قرار عقاري يبدأ بمعلومة واضحة.
               </h2>
               <p className="mt-5 max-w-2xl text-[15px] leading-[1.7] text-primary-foreground/72">
-                فريق نِفال جاهز لترتيب الاستفسار، الزيارة، أو الخطوة التالية حسب احتياجك.
+                تواصل مع فريق نفال للحصول على المعلومات التي تحتاجها، والإجابة عن استفساراتك،
+                ومساعدتك في اتخاذ قرار عقاري بثقة.
               </p>
             </div>
             <a

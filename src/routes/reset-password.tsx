@@ -21,7 +21,7 @@ const schema = z
   });
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "إعادة تعيين كلمة المرور | نِفال العقارية" }] }),
+  head: () => ({ meta: [{ title: "إعادة تعيين كلمة المرور | نفال العقارية" }] }),
   component: ResetPasswordPage,
 });
 
