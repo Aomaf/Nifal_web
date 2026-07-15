@@ -557,6 +557,15 @@ function ValueSection({
                 i === slideIndex ? "opacity-100" : "opacity-0",
               ].join(" ")}
               loading="lazy"
+              // If an image (often an external fallback) fails, swap to a known-good
+              // one once so the slide never shows an empty black frame.
+              onError={(e) => {
+                const img = e.currentTarget;
+                if (img.dataset.fallbackApplied) return;
+                img.dataset.fallbackApplied = "true";
+                img.src =
+                  "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80";
+              }}
             />
           ))}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,24,22,0.00),rgba(28,24,22,0.12))]" />

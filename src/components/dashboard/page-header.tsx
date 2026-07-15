@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { ChevronLeft } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
@@ -33,14 +33,16 @@ export function PageHeader({ title, subtitle, breadcrumbs, action, className }: 
             <BreadcrumbList>
               {breadcrumbs.map((crumb, i) => {
                 const isLast = i === breadcrumbs.length - 1;
+                // The separator must be a SIBLING of the item, not a child —
+                // both render <li>, and an <li> inside an <li> is invalid HTML.
                 return (
-                  <BreadcrumbItem key={i}>
-                    {isLast ? (
-                      <BreadcrumbPage className="text-xs text-muted-foreground">
-                        {crumb.label}
-                      </BreadcrumbPage>
-                    ) : (
-                      <>
+                  <Fragment key={i}>
+                    <BreadcrumbItem>
+                      {isLast ? (
+                        <BreadcrumbPage className="text-xs text-muted-foreground">
+                          {crumb.label}
+                        </BreadcrumbPage>
+                      ) : (
                         <BreadcrumbLink asChild>
                           <Link
                             to={crumb.to as never}
@@ -49,12 +51,14 @@ export function PageHeader({ title, subtitle, breadcrumbs, action, className }: 
                             {crumb.label}
                           </Link>
                         </BreadcrumbLink>
-                        <BreadcrumbSeparator>
-                          <ChevronLeft className="h-3 w-3" />
-                        </BreadcrumbSeparator>
-                      </>
+                      )}
+                    </BreadcrumbItem>
+                    {!isLast && (
+                      <BreadcrumbSeparator>
+                        <ChevronLeft className="h-3 w-3" />
+                      </BreadcrumbSeparator>
                     )}
-                  </BreadcrumbItem>
+                  </Fragment>
                 );
               })}
             </BreadcrumbList>

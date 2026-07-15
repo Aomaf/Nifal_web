@@ -759,9 +759,14 @@ function AdminProperties() {
                   variant="ghost"
                   size="icon"
                   title={p.is_published ? "إلغاء النشر" : "نشر"}
-                  onClick={() =>
-                    toggle.mutate({ id: p.id, field: "is_published", value: !p.is_published })
-                  }
+                  onClick={() => {
+                    // Publishing requires at least one image (same rule the edit dialog enforces).
+                    if (!p.is_published && imgCount === 0) {
+                      toast.error("يجب إضافة صورة واحدة على الأقل قبل النشر");
+                      return;
+                    }
+                    toggle.mutate({ id: p.id, field: "is_published", value: !p.is_published });
+                  }}
                 >
                   {p.is_published ? (
                     <Eye className="h-4 w-4 text-success" />
