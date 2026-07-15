@@ -39,13 +39,13 @@ export function SiteFooter() {
           <h3 className="font-semibold mb-4">تواصل معنا</h3>
           <ul className="space-y-2 text-sm text-primary-foreground/80">
             <li className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-accent" /> 920000000
+              <Phone className="h-4 w-4 text-accent" /> 0550052120
             </li>
             <li className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4 text-accent" /> واتساب
             </li>
             <li className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-accent" /> info@nafal.sa
+              <Mail className="h-4 w-4 text-accent" /> nafal.com.sa@gmail.com
             </li>
             <li className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-accent" /> الرياض، المملكة العربية السعودية

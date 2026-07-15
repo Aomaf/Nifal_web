@@ -74,17 +74,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "نِفال العقارية | عقارك المثالي بين يديك" },
+      { title: "نفال العقارية | بداية موثوقة لرحلتك العقارية" },
       {
         name: "description",
         content:
-          "نِفال العقارية - منصة عقارية شاملة في المملكة العربية السعودية لبيع وإيجار الفلل والشقق والمكاتب والأراضي.",
+          "نفال العقارية - منصة عقارية شاملة في المملكة العربية السعودية لبيع وإيجار الفلل والشقق والمكاتب والأراضي.",
       },
       { name: "author", content: "Nafal Real Estate" },
-      { property: "og:title", content: "نِفال العقارية" },
+      { property: "og:title", content: "نفال العقارية | بداية موثوقة لرحلتك العقارية" },
       {
         property: "og:description",
-        content: "عقارك المثالي بين يديك - فلل، شقق، مكاتب وأراضي في الرياض وجدة والدمام.",
+        content: "مشاريع وعقارات مختارة، نعرضها بمعلومات واضحة وتفاصيل دقيقة، لتتخذ قرارك بثقة.",
       },
       { property: "og:type", content: "website" },
     ],

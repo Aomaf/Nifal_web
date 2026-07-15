@@ -17,6 +17,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -69,6 +70,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PropertiesIndexRoute = PropertiesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PropertiesRoute,
 } as any)
 const PropertiesIdRoute = PropertiesIdRouteImport.update({
   id: '/$id',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/properties/$id': typeof PropertiesIdRoute
+  '/properties/': typeof PropertiesIndexRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/collections': typeof AuthenticatedAdminCollectionsRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -171,10 +178,10 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/nifal-console': typeof NifalConsoleRoute
-  '/properties': typeof PropertiesRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/properties/$id': typeof PropertiesIdRoute
+  '/properties': typeof PropertiesIndexRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/collections': typeof AuthenticatedAdminCollectionsRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -199,6 +206,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/properties/$id': typeof PropertiesIdRoute
+  '/properties/': typeof PropertiesIndexRoute
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/_authenticated/admin/collections': typeof AuthenticatedAdminCollectionsRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -223,6 +231,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin'
     | '/properties/$id'
+    | '/properties/'
     | '/admin/clients'
     | '/admin/collections'
     | '/admin/leads'
@@ -240,10 +249,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/nifal-console'
-    | '/properties'
     | '/reset-password'
     | '/sitemap.xml'
     | '/properties/$id'
+    | '/properties'
     | '/admin/clients'
     | '/admin/collections'
     | '/admin/leads'
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/properties/$id'
+    | '/properties/'
     | '/_authenticated/admin/clients'
     | '/_authenticated/admin/collections'
     | '/_authenticated/admin/leads'
@@ -348,6 +358,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/properties/': {
+      id: '/properties/'
+      path: '/'
+      fullPath: '/properties/'
+      preLoaderRoute: typeof PropertiesIndexRouteImport
+      parentRoute: typeof PropertiesRoute
     }
     '/properties/$id': {
       id: '/properties/$id'
@@ -487,10 +504,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface PropertiesRouteChildren {
   PropertiesIdRoute: typeof PropertiesIdRoute
+  PropertiesIndexRoute: typeof PropertiesIndexRoute
 }
 
 const PropertiesRouteChildren: PropertiesRouteChildren = {
   PropertiesIdRoute: PropertiesIdRoute,
+  PropertiesIndexRoute: PropertiesIndexRoute,
 }
 
 const PropertiesRouteWithChildren = PropertiesRoute._addFileChildren(

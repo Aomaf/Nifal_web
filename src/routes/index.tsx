@@ -91,7 +91,7 @@ function Home() {
   const valueItems = [
     {
       icon: "shield",
-      title: "شفافية العرض",
+      title: "شفافية حقيقية",
       text: "السعر، الموقع، وحالة العقار تظهر بصورة مباشرة دون مبالغة.",
     },
     {
@@ -143,12 +143,10 @@ function Home() {
             <div className="max-w-4xl space-y-8 text-center sm:text-right">
               <div className="space-y-5">
                 <h1 className="text-[2.2rem] font-semibold leading-[1.12] tracking-[-0.01em] sm:text-[2.8rem] lg:text-[3.2rem]">
-                  <span className="block">عقارات مختارة بعناية،</span>
-                  <span className="block text-white/85">وقرارات أوضح.</span>
+                  بداية موثوقة لرحلتك العقارية
                 </h1>
                 <p className="mx-auto max-w-[320px] text-[15px] font-normal leading-[1.7] text-white/55 sm:mx-0 sm:max-w-[52ch] md:text-base">
-                  عقارات ومشاريع في مدن المملكة، بمعلومات واضحة تساعدك على المقارنة، وتواصل مباشر مع
-                  فريق نِفال.
+                  مشاريع وعقارات مختارة، نعرضها بمعلومات واضحة وتفاصيل دقيقة، لتتخذ قرارك بثقة.
                 </p>
               </div>
               <div className="grid gap-3 pt-1 sm:flex sm:flex-wrap">
@@ -237,7 +235,7 @@ function Home() {
       </section>
 
       <PropertySection
-        title="اختيارات تناسب السكن والاستثمار"
+        title="عقارات موثوقة للسكن والاستثمار"
         description="عقارات منتقاة من فريق نِفال، مرتبة بصورة واضحة حتى تقارن بين السعر، الموقع، والمساحة بسرعة."
         properties={featured.rows as PropertyCardData[]}
       />
@@ -274,10 +272,11 @@ function Home() {
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
             <div>
               <h2 className="mt-4 text-3xl font-medium leading-[1.25] md:text-[2rem]">
-                اختر العقار، واترك التفاصيل علينا.
+                كل قرار عقاري يبدأ بمعلومة واضحة.
               </h2>
               <p className="mt-5 max-w-2xl text-[15px] leading-[1.7] text-primary-foreground/72">
-                فريق نِفال جاهز لترتيب الاستفسار، الزيارة، أو الخطوة التالية حسب احتياجك.
+                تواصل مع فريق نفال للحصول على المعلومات التي تحتاجها، والإجابة عن استفساراتك،
+                ومساعدتك في اتخاذ قرار عقاري بثقة.
               </p>
             </div>
             <a
@@ -456,7 +455,7 @@ function RegaSearchCard() {
         />
         {status === "not_found" && (
           <p className="text-[12px] text-destructive text-right">
-            لم يُعثر على عقار بهذا المعرف. تحقق من الرقم وحاول مجدداً.
+            لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.
           </p>
         )}
         {status === "error" && (
@@ -511,7 +510,7 @@ function ValueSection({
             <h2 className="text-[2.4rem] font-semibold leading-[1.15] text-foreground md:text-[3rem]">
               الأساسيات العقارية،
               <br />
-              مرتبة بوضوح.
+              واضحة ومرتبة.
             </h2>
             <p className="text-[15px] leading-[1.75] text-muted-foreground">
               نضع الصورة والمعلومة في المقدمة، مع تفاصيل عملية تساعدك على المقارنة قبل التواصل.
@@ -558,6 +557,15 @@ function ValueSection({
                 i === slideIndex ? "opacity-100" : "opacity-0",
               ].join(" ")}
               loading="lazy"
+              // If an image (often an external fallback) fails, swap to a known-good
+              // one once so the slide never shows an empty black frame.
+              onError={(e) => {
+                const img = e.currentTarget;
+                if (img.dataset.fallbackApplied) return;
+                img.dataset.fallbackApplied = "true";
+                img.src =
+                  "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80";
+              }}
             />
           ))}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,24,22,0.00),rgba(28,24,22,0.12))]" />

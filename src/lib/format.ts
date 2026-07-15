@@ -42,4 +42,4 @@ export function buildWhatsAppUrl(phone: string, message: string): string {
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
 
-export const COMPANY_WHATSAPP = "966500000000";
+export const COMPANY_WHATSAPP = "966550052120";

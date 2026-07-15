@@ -94,13 +94,10 @@ function Home() {
               <SectionKicker tone="dark">WELCOME TO NIFAL</SectionKicker>
               <div className="space-y-6">
                 <h1 className="max-w-full text-[3rem] font-medium leading-[1.08] tracking-normal sm:text-[4.5rem] md:max-w-4xl lg:text-[5rem]">
-                  <span className="block">عقارات مختارة</span>
-                  <span className="block">بعناية،</span>
-                  <span className="block">وقرارات أوضح.</span>
+                  بداية موثوقة لرحلتك العقارية
                 </h1>
                 <p className="mx-auto max-w-[320px] text-base leading-[1.65] text-white/68 sm:mx-0 sm:max-w-[58ch] md:text-[17px]">
-                  نعرض لك مشاريع وفرص عقارية في السعودية بواجهة هادئة، معلومات واضحة، وتجربة تواصل
-                  مباشرة مع فريق نِفال.
+                  مشاريع وعقارات مختارة، نعرضها بمعلومات واضحة وتفاصيل دقيقة، لتتخذ قرارك بثقة.
                 </p>
               </div>
               <div className="grid gap-3 pt-1 sm:flex sm:flex-wrap">
@@ -327,10 +324,11 @@ function Home() {
             <div>
               <SectionKicker tone="dark">START THE CONVERSATION</SectionKicker>
               <h2 className="mt-4 text-3xl font-medium leading-[1.25] md:text-[2rem]">
-                اختر العقار، واترك التفاصيل علينا.
+                كل قرار عقاري يبدأ بمعلومة واضحة.
               </h2>
               <p className="mt-5 max-w-2xl text-[15px] leading-[1.7] text-primary-foreground/72">
-                فريق نِفال جاهز لترتيب الاستفسار، الزيارة، أو الخطوة التالية حسب احتياجك.
+                تواصل مع فريق نفال للحصول على المعلومات التي تحتاجها، والإجابة عن استفساراتك،
+                ومساعدتك في اتخاذ قرار عقاري بثقة.
               </p>
             </div>
             <a
