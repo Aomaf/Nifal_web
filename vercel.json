@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:website",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": ".vercel/output",
   "installCommand": "npm install",
   "framework": null
