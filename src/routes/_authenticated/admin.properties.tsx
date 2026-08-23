@@ -68,7 +68,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { PROPERTY_TYPE_LABELS } from "@/lib/format";
+import { PROPERTY_TYPE_LABELS, parseMapCoords } from "@/lib/format";
 import { ATTRIBUTE_FIELDS, TYPE_FIELDS } from "@/lib/property-fields";
 import { SarAmount } from "@/components/ui/sar-icon";
 
@@ -156,6 +156,7 @@ const schema = z.object({
     "chalet",
     "house",
     "farm",
+    "commercial_hall",
   ]),
   purpose: z.enum(["sale", "rent"]),
   price: z.coerce.number().nonnegative(),
@@ -169,6 +170,8 @@ const schema = z.object({
   sold_percentage: z.coerce.number().min(0).max(100).optional().nullable(),
   handover_date: z.string().optional().nullable(),
   hero_video_url: z.string().url("رابط غير صالح").optional().nullable().or(z.literal("")),
+  is_negotiable: z.boolean().default(false),
+  map_url: z.string().optional().nullable(),
   tags: z.string().default(""),
   is_archived: z.boolean().default(false),
   // Type-specific fields (see src/lib/property-fields.ts).
@@ -192,6 +195,34 @@ type SavedImage = {
   is_primary: boolean;
   sort_order: number;
 };
+
+// Feedback under the Google Maps link field: tells the admin whether we could
+// pull coordinates out of the pasted link (short goo.gl links cannot be read
+// without resolving them, so the map embed is skipped for those).
+function MapUrlHint({ value }: { value?: string | null }) {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    return (
+      <p className="mt-1 text-xs text-muted-foreground">
+        الصق رابط الموقع من تطبيق خرائط قوقل — سيتم استخراج الإحداثيات تلقائياً.
+      </p>
+    );
+  }
+  const coords = parseMapCoords(trimmed);
+  if (coords) {
+    return (
+      <p className="mt-1 text-xs text-emerald-700" dir="ltr">
+        ✓ {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
+      </p>
+    );
+  }
+  return (
+    <p className="mt-1 text-xs text-amber-700">
+      لم نتمكن من استخراج الإحداثيات من هذا الرابط. الروابط المختصرة (maps.app.goo.gl) تحتاج فتحها
+      في المتصفح ثم نسخ الرابط الكامل — سيتم حفظ الرابط كما هو بدون خريطة مدمجة.
+    </p>
+  );
+}
 
 function parseTags(value: string) {
   return value
@@ -337,7 +368,7 @@ function ImageManager({
           <ImagePlus className="h-6 w-6" />
         )}
         <span className="text-sm font-medium">
-          {compressing ? "جاري ضغط الصور..." : "اضغط لرفع الصور أو اسحبها هنا"}
+          {compressing ? "جارٍ ضغط الصور..." : "اضغط لرفع الصور أو اسحبها هنا"}
         </span>
         <span className="text-xs">JPEG, PNG, WebP — يتم الضغط تلقائياً إلى WebP</span>
       </button>
@@ -582,7 +613,11 @@ function AdminProperties() {
   };
   const toggleOne = (id: string) => {
     const next = new Set(selectedIds);
-    next.has(id) ? next.delete(id) : next.add(id);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
     setSelectedIds(next);
   };
 
@@ -610,6 +645,8 @@ function AdminProperties() {
       sold_percentage: (p.sold_percentage as number) ?? null,
       handover_date: (p.handover_date as string) ?? null,
       hero_video_url: (p.hero_video_url as string) ?? null,
+      is_negotiable: !!(p.is_negotiable as boolean),
+      map_url: (p.map_url as string) ?? null,
       tags: ((p.tags as string[]) ?? []).join(", "),
       is_archived: !!(p.is_archived as boolean),
       attributes: (p.attributes as Record<string, string | number>) ?? {},
@@ -998,6 +1035,8 @@ function PropertyDialog({
       sold_percentage: null,
       handover_date: null,
       hero_video_url: null,
+      is_negotiable: false,
+      map_url: null,
       tags: "",
       is_archived: false,
       attributes: {},
@@ -1029,10 +1068,18 @@ function PropertyDialog({
         const val = (v.attributes as Record<string, string | number>)?.[k];
         if (val != null && val !== "") cleanAttributes[k] = val;
       }
+      // Derive coordinates from the pasted Google Maps link so the public page
+      // can embed a map. Short links carry no coords — we keep the link only.
+      const mapUrl = v.map_url?.trim() || null;
+      const coords = mapUrl ? parseMapCoords(mapUrl) : null;
+
       const row = await upsertProperty({
         data: {
           ...v,
           hero_video_url: v.hero_video_url || null,
+          map_url: mapUrl,
+          location_lat: coords?.lat ?? null,
+          location_lng: coords?.lng ?? null,
           tags: parseTags(v.tags),
           attributes: cleanAttributes,
         },
@@ -1196,6 +1243,21 @@ function PropertyDialog({
                   <Input type="number" {...form.register("area_sqm")} />
                 </div>
               </div>
+              <div className="flex items-center justify-between gap-4 rounded-lg bg-muted p-3">
+                <div>
+                  <Label htmlFor="negotiable" className="cursor-pointer">
+                    السعر قابل للمساومة
+                  </Label>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    يظهر شارة «قابل للتفاوض» وزر «قدّم عرضك» في صفحة العقار
+                  </p>
+                </div>
+                <Switch
+                  id="negotiable"
+                  checked={form.watch("is_negotiable")}
+                  onCheckedChange={(v) => form.setValue("is_negotiable", v)}
+                />
+              </div>
               <div>
                 <Label>الحالة</Label>
                 <Select
@@ -1310,6 +1372,15 @@ function PropertyDialog({
                 </div>
               </div>
               <div>
+                <Label>رابط قوقل ماب</Label>
+                <Input
+                  dir="ltr"
+                  placeholder="https://maps.google.com/..."
+                  {...form.register("map_url")}
+                />
+                <MapUrlHint value={form.watch("map_url")} />
+              </div>
+              <div>
                 <Label>الوسوم (مفصولة بفاصلة)</Label>
                 <Input placeholder="مميز, جديد, قريباً" {...form.register("tags")} />
               </div>
@@ -1391,7 +1462,7 @@ function PropertyDialog({
               إلغاء
             </Button>
             <Button type="submit" className="btn-hero" disabled={isSubmitting}>
-              {isSubmitting ? (uploadingImages ? "جاري رفع الصور..." : "جاري الحفظ...") : "حفظ"}
+              {isSubmitting ? (uploadingImages ? "جارٍ رفع الصور..." : "جارٍ الحفظ...") : "حفظ"}
             </Button>
           </DialogFooter>
         </form>

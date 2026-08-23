@@ -39,7 +39,7 @@
   },
   "admin_dashboard": {
     "page_title": "لوحة التحكم",
-    "page_subtitle": "نظرة عامة على نشاط منصة نِفال العقارية",
+    "page_subtitle": "نظرة عامة على نشاط منصة نفال العقارية",
     "no_roles_title": "حسابك مفعّل لكن بدون صلاحيات بعد.",
     "no_roles_description": "يحتاج المدير العام إلى منحك دور (مثل: property_manager) لتتمكن من إدارة العقارات. معرف المستخدم: {userId}",
     "kpi_total_properties": "إجمالي العقارات",

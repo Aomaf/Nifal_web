@@ -35,7 +35,7 @@ export const listPublicProperties = createServerFn({ method: "GET" })
     let q = supabaseAdmin
       .from("properties")
       .select(
-        "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,views_count,created_at,attributes, property_images(image_url,is_primary,sort_order)",
+        "id,title,city,district,type,purpose,price,area_sqm,bedrooms,bathrooms,status,is_featured,is_negotiable,views_count,created_at,attributes, property_images(image_url,is_primary,sort_order)",
         { count: "exact" },
       )
       .eq("is_published", true);
@@ -234,6 +234,7 @@ const PropertyInput = z.object({
     "chalet",
     "house",
     "farm",
+    "commercial_hall",
   ]),
   purpose: z.enum(["sale", "rent"]),
   price: z.number().nonnegative(),
@@ -247,6 +248,11 @@ const PropertyInput = z.object({
   sold_percentage: z.number().min(0).max(100).optional().nullable(),
   handover_date: z.string().optional().nullable(),
   hero_video_url: z.string().url().optional().or(z.literal("")).nullable(),
+  is_negotiable: z.boolean().default(false),
+  // Pasted Google Maps link; coordinates are derived from it on submit.
+  map_url: z.string().max(2000).optional().or(z.literal("")).nullable(),
+  location_lat: z.number().min(-90).max(90).optional().nullable(),
+  location_lng: z.number().min(-180).max(180).optional().nullable(),
   tags: z.array(z.string()).default([]),
   is_archived: z.boolean().default(false),
   // Type-specific fields (see src/lib/property-fields.ts). Values are strings

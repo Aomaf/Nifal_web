@@ -33,6 +33,7 @@ export type PropertyCardData = {
   bedrooms: number | null;
   bathrooms: number | null;
   is_featured: boolean | null;
+  is_negotiable?: boolean | null;
   sold_percentage?: number | null;
   attributes?: Record<string, string | number> | null;
   property_images?: Img[] | null;
@@ -124,6 +125,9 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
             <p className="tabular text-2xl font-medium leading-none text-primary">
               <SarAmount value={p.price} />
             </p>
+            {p.is_negotiable && (
+              <p className="mt-1 text-[11px] font-medium text-accent-dark">قابل للتفاوض</p>
+            )}
           </div>
           <span className="text-[12px] font-medium text-accent-dark transition group-hover:text-primary">
             عرض التفاصيل

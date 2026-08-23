@@ -428,6 +428,7 @@ export type Database = {
       properties: {
         Row: {
           area_sqm: number | null;
+          attributes: Json;
           bathrooms: number | null;
           bedrooms: number | null;
           city: string;
@@ -436,6 +437,8 @@ export type Database = {
           district: string | null;
           handover_date: string | null;
           hero_video_url: string | null;
+          is_negotiable: boolean;
+          map_url: string | null;
           id: string;
           is_archived: boolean;
           is_featured: boolean;
@@ -458,6 +461,7 @@ export type Database = {
         };
         Insert: {
           area_sqm?: number | null;
+          attributes?: Json;
           bathrooms?: number | null;
           bedrooms?: number | null;
           city: string;
@@ -466,6 +470,8 @@ export type Database = {
           district?: string | null;
           handover_date?: string | null;
           hero_video_url?: string | null;
+          is_negotiable?: boolean;
+          map_url?: string | null;
           id?: string;
           is_archived?: boolean;
           is_featured?: boolean;
@@ -488,6 +494,7 @@ export type Database = {
         };
         Update: {
           area_sqm?: number | null;
+          attributes?: Json;
           bathrooms?: number | null;
           bedrooms?: number | null;
           city?: string;
@@ -496,6 +503,8 @@ export type Database = {
           district?: string | null;
           handover_date?: string | null;
           hero_video_url?: string | null;
+          is_negotiable?: boolean;
+          map_url?: string | null;
           id?: string;
           is_archived?: boolean;
           is_featured?: boolean;
@@ -768,7 +777,13 @@ export type Database = {
         | "residential_land"
         | "commercial_land"
         | "industrial_land"
-        | "building";
+        | "building"
+        | "floor"
+        | "istiraha"
+        | "chalet"
+        | "house"
+        | "farm"
+        | "commercial_hall";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -914,6 +929,12 @@ export const Constants = {
         "commercial_land",
         "industrial_land",
         "building",
+        "floor",
+        "istiraha",
+        "chalet",
+        "house",
+        "farm",
+        "commercial_hall",
       ],
     },
   },

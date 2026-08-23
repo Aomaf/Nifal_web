@@ -12,28 +12,31 @@
   },
 
   "site_footer": {
-    "tagline": "نِفال العقارية في المملكة العربية السعودية. تسويق عقاري، بيع وشراء، وتأجير، بمعلومات واضحة وتواصل مباشر.",
+    "tagline": "نفال العقارية في المملكة العربية السعودية. تسويق عقاري، بيع وشراء، وتأجير، بمعلومات واضحة وتواصل مباشر.",
     "quick_links_heading": "روابط سريعة",
     "link_properties": "العقارات",
     "link_about": "من نحن",
     "link_contact": "تواصل معنا",
     "contact_heading": "تواصل معنا",
-    "contact_phone": "0550052120",
+    "contact_phone_sales": "0550052129",
+    "contact_phone_sales_label": "قسم البيع",
+    "contact_phone_rentals": "0542352129",
+    "contact_phone_rentals_label": "قسم الإيجار",
     "contact_whatsapp": "واتساب",
     "contact_email": "nafal.com.sa@gmail.com",
     "contact_address": "الرياض، المملكة العربية السعودية",
     "vision_heading": "رؤيتنا",
     "vision_text": "أن نكون الخيار الأول لمن يبحث عن قرار عقاري واضح يثق به.",
-    "copyright": "© {year} نِفال العقارية. جميع الحقوق محفوظة."
+    "copyright": "© {year} نفال العقارية. جميع الحقوق محفوظة."
   },
 
   "home_page": {
     "hero_headline_line1": "عقارات مختارة بعناية،",
     "hero_headline_line2": "وقرارات واضحة.",
-    "hero_subheading": "عقارات ومشاريع في مدن المملكة، بمعلومات واضحة تساعدك على المقارنة، وتواصل مباشر مع فريق نِفال.",
+    "hero_subheading": "عقارات ومشاريع في مدن المملكة، بمعلومات واضحة تساعدك على المقارنة، وتواصل مباشر مع فريق نفال.",
     "hero_cta_browse": "تصفح العقارات",
-    "hero_cta_whatsapp": "تواصل واتساب",
-    "hero_whatsapp_message": "السلام عليكم، أرغب بالاستفسار عن عقارات نِفال",
+    "hero_cta_whatsapp": "راسلنا عبر واتساب",
+    "hero_whatsapp_message": "السلام عليكم، أرغب بالاستفسار عن عقارات نفال",
 
     "stats_available_properties": "عقار متاح",
     "stats_cities_served": "مدن نخدمها",
@@ -45,7 +48,7 @@
     "nav_card_contact": "تواصل معنا",
 
     "section_featured_title": "عقارات موثوقة للسكن والاستثمار",
-    "section_featured_description": "عقارات منتقاة من فريق نِفال، مرتبة بصورة واضحة حتى تقارن بين السعر، الموقع، والمساحة بسرعة.",
+    "section_featured_description": "مختارة بعناية من فريق نفال. سهولة المقارنة بين السعر والموقع والمساحة.",
     "section_latest_title": "فرص أضيفت حديثا",
     "section_latest_description": "تابع أحدث العقارات المتاحة في المدن التي نخدمها، مع تفاصيل مركزة وصور تقود القرار.",
     "section_best_selling_title": "مشاريع عليها طلب واضح",
@@ -68,7 +71,7 @@
     "value_slider_next_aria": "الصورة التالية",
 
     "cta_section_headline": "اختر العقار، واترك التفاصيل علينا.",
-    "cta_section_subheading": "فريق نِفال جاهز لترتيب الاستفسار، الزيارة، أو الخطوة التالية حسب احتياجك.",
+    "cta_section_subheading": "فريق نفال جاهز لترتيب الاستفسار، الزيارة، أو الخطوة التالية حسب احتياجك.",
     "cta_section_button": "تواصل عبر واتساب",
     "cta_section_whatsapp_message": "السلام عليكم، أرغب بالتواصل معكم",
 
@@ -77,12 +80,12 @@
     "rega_search_placeholder": "مثال: 1234567890",
     "rega_search_button": "بحث",
     "rega_search_loading": "جارٍ البحث…",
-    "rega_search_not_found": "لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.",
+    "rega_search_not_found": "لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجددًا.",
     "rega_search_error": "حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى."
   },
 
   "properties_page": {
-    "page_title": "العقارات | نِفال العقارية",
+    "page_title": "العقارات | نفال العقارية",
     "page_description": "تصفّح عقارات للبيع والإيجار في مدن المملكة، مع تفاصيل واضحة تساعدك على المقارنة قبل التواصل.",
     "hero_headline": "ابحث عن العقار المناسب بوضوح.",
     "hero_subheading": "فلترة سريعة ومعلومات أساسية لكل عقار تساعدك على المقارنة قبل التواصل.",
@@ -104,9 +107,9 @@
     "results_loading": "جارٍ التحميل…",
     "results_count_suffix": "عقار",
 
-    "empty_state_emoji": "🔍",
+    "empty_state_emoji": "بحث",
     "empty_state_title": "لا توجد نتائج",
-    "empty_state_description": "جرّب توسيع نطاق البحث أو تغيير الفلاتر، أو أعد الضبط لعرض كل العقارات.",
+    "empty_state_description": "عدّل الفلاتر أو وسّع نطاق البحث.",
     "empty_state_reset_button": "إعادة ضبط",
 
     "pagination_prev": "السابق",
@@ -115,7 +118,7 @@
 
     "rega_search_button": "بحث",
     "rega_search_loading": "جارٍ البحث…",
-    "rega_search_not_found": "لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.",
+    "rega_search_not_found": "لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجددًا.",
     "rega_search_error": "حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى."
   },
 
@@ -158,30 +161,32 @@
   },
 
   "about_page": {
-    "page_title": "من نحن | نِفال العقارية",
-    "page_description": "تعرّف على نِفال العقارية، قصتنا، رؤيتنا، رسالتنا وقيمنا.",
+    "page_title": "من نحن | نفال العقارية",
+    "page_description": "تعرّف على نفال العقارية، رؤيتنا، رسالتنا وقيمنا.",
     "hero_headline": "من نحن",
-    "hero_subheading": "شركة عقارية سعودية تعمل في التسويق العقاري، البيع والشراء، والتأجير، وتبني عملها على الوضوح والثقة.",
-    "story_heading": "قصتنا",
-    "story_body": "تأسست نِفال لتقدّم عملاً عقارياً واضحاً يبقى مع الوقت. نرى العقار قراراً يهمّ صاحبه، لا مجرد صفقة، لذلك نعرض المعلومة كما هي ونترك القرار للعميل. نعمل اليوم في التسويق العقاري، وبيع وشراء العقارات، والتأجير، وتسويق المشاريع، في مدن المملكة.",
+    "hero_subheading": "نفال العقارية شركة عقارية سعودية متخصصة في التسويق العقاري، وبيع وشراء العقارات، وتأجيرها، وتسويق المشاريع العقارية، تعمل وفق مبادئ الوضوح، والجودة، والثقة.",
+    "story_heading": "",
+    "story_body": "",
     "vision_title": "رؤيتنا",
-    "vision_text": "أن نكون الخيار الأول لمن يبحث عن قرار عقاري واضح يثق به.",
+    "vision_text": "أن تكون نفال مرجعًا موثوقًا في تقديم الحلول العقارية، وبناء قيمة مستدامة تمتد أثرًا عبر الأجيال.",
     "mission_title": "رسالتنا",
-    "mission_text": "أن نساعد العميل على اتخاذ قرار عقاري أوضح، بمعلومة صادقة وتعامل هادئ.",
+    "mission_text": "نمكّن عملاءنا من اتخاذ قرارات عقارية واثقة، من خلال معلومات واضحة، وتسويق احترافي، وتجربة موثوقة ترتكز على الجودة، وتحقق قيمة مستدامة لجميع الأطراف.",
     "values_title": "قيمنا",
-    "values_text": "النزاهة، الجودة، الالتزام، وخدمة العميل قبل البيع."
+    "values_text": "الثقة، الجودة، الاحترافية، الشفافية، الابتكار، الاستدامة"
   },
 
   "contact_page": {
-    "page_title": "تواصل معنا | نِفال العقارية",
-    "page_description": "تواصل مع فريق نِفال العقارية للاستفسار عن العقارات والخدمات.",
+    "page_title": "تواصل معنا | نفال العقارية",
+    "page_description": "تواصل مع فريق نفال العقارية للاستفسار عن العقارات والخدمات.",
     "hero_headline": "تواصل معنا",
-    "hero_subheading": "أرسل استفسارك وسيتواصل معك فريق نِفال في أقرب وقت.",
+    "hero_subheading": "أرسل استفسارك وسيتواصل معك فريق نفال في أقرب وقت.",
     "contact_info_heading": "معلومات التواصل",
-    "label_phone": "الهاتف",
-    "phone_value": "0550052120",
+    "label_phone_sales": "قسم البيع",
+    "phone_value_sales": "0550052129",
+    "label_phone_rentals": "قسم الإيجار",
+    "phone_value_rentals": "0542352129",
     "label_whatsapp": "واتساب",
-    "whatsapp_value": "+966 55 005 2120",
+    "whatsapp_value": "055 005 2129",
     "label_email": "البريد",
     "email_value": "nafal.com.sa@gmail.com",
     "label_address": "العنوان",
@@ -196,7 +201,7 @@
   },
 
   "login_page": {
-    "page_title": "تسجيل الدخول | نِفال العقارية",
+    "page_title": "تسجيل الدخول | نفال العقارية",
     "subtitle": "لوحة الإدارة",
     "tab_login": "تسجيل دخول",
     "tab_signup": "حساب جديد",
@@ -204,7 +209,7 @@
     "label_password": "كلمة المرور",
     "label_full_name": "الاسم الكامل",
     "login_button_idle": "تسجيل الدخول",
-    "login_button_loading": "جاري الدخول...",
+    "login_button_loading": "جارٍ الدخول...",
     "signup_button_idle": "إنشاء حساب",
     "signup_button_loading": "جارٍ الإنشاء...",
     "forgot_password_link": "نسيت كلمة المرور؟",
@@ -223,7 +228,7 @@
   },
 
   "reset_password_page": {
-    "page_title": "إعادة تعيين كلمة المرور | نِفال العقارية",
+    "page_title": "إعادة تعيين كلمة المرور | نفال العقارية",
     "headline": "إعادة تعيين كلمة المرور",
     "verifying_link": "يرجى الانتظار... جارٍ التحقق من الرابط.",
     "label_new_password": "كلمة المرور الجديدة",
@@ -236,7 +241,7 @@
   },
 
   "floating_whatsapp": {
-    "whatsapp_message": "السلام عليكم، أرغب بالاستفسار عن عقارات نِفال"
+    "whatsapp_message": "السلام عليكم، أرغب بالاستفسار عن عقارات نفال"
   },
 
   "admin_layout": {
@@ -267,7 +272,7 @@
     "expand_sidebar": "توسيع القائمة",
     "toast_signed_out": "تم تسجيل الخروج",
     "error_boundary_title": "حدث خطأ غير متوقع",
-    "error_boundary_retry": "حاول مجدداً",
+    "error_boundary_retry": "حاول مجددًا",
     "search_dialog_title": "بحث",
     "search_dialog_placeholder": "ابحث في العقارات، العملاء، الطلبات...",
     "search_results_heading": "نتائج البحث",
@@ -279,7 +284,7 @@
 
   "admin_dashboard": {
     "page_title": "لوحة التحكم",
-    "page_subtitle": "نظرة عامة على نشاط منصة نِفال العقارية",
+    "page_subtitle": "نظرة عامة على نشاط منصة نفال العقارية",
     "no_roles_title": "حسابك مفعّل لكن بدون صلاحيات بعد.",
     "no_roles_description": "يحتاج المدير العام إلى منحك دور (مثل: property_manager) لتتمكن من إدارة العقارات. معرف المستخدم: {userId}",
     "kpi_total_properties": "إجمالي العقارات",
@@ -367,8 +372,8 @@
     "publish_error": "يجب إضافة صورة واحدة على الأقل قبل النشر",
     "cancel_button": "إلغاء",
     "save_button": "حفظ",
-    "save_loading": "جاري الحفظ...",
-    "save_uploading": "جاري رفع الصور...",
+    "save_loading": "جارٍ الحفظ...",
+    "save_uploading": "جارٍ رفع الصور...",
     "toast_saved": "تم الحفظ",
     "toast_deleted": "تم الحذف",
     "error_title_required": "العنوان مطلوب",
@@ -419,7 +424,7 @@
   "admin_images": {
     "upload_prompt": "اضغط لرفع الصور أو اسحبها هنا",
     "upload_hint": "JPEG, PNG, WebP — يتم الضغط تلقائياً إلى WebP",
-    "compressing": "جاري ضغط الصور...",
+    "compressing": "جارٍ ضغط الصور...",
     "no_images_yet": "لا توجد صور بعد",
     "saved_images_label": "الصور المحفوظة ({count})",
     "staged_images_label": "في انتظار الرفع ({count}) — ستُرفع عند الحفظ",
@@ -443,7 +448,7 @@
     "kpi_closed": "صفقات مغلقة",
     "kpi_overdue": "متابعات متأخرة",
     "empty_title": "لا يوجد عملاء",
-    "loading": "جاري التحميل…",
+    "loading": "جارٍ التحميل…",
     "overdue_badge": "متابعة متأخرة",
     "kanban_drop_here": "أسقط هنا",
     "budget_total_label": "إجمالي الميزانية",
@@ -457,7 +462,7 @@
     "activity_add_heading": "إضافة نشاط",
     "activity_notes_placeholder": "ملاحظات (اختياري)...",
     "activity_add_button": "إضافة",
-    "activity_loading": "جاري التحميل…",
+    "activity_loading": "جارٍ التحميل…",
     "activity_empty": "لا توجد أنشطة بعد",
     "toast_activity_added": "تم إضافة النشاط",
     "dialog_create_title": "إضافة عميل",
@@ -476,7 +481,7 @@
     "label_notes": "ملاحظات",
     "cancel_button": "إلغاء",
     "save_button_idle": "حفظ",
-    "save_button_loading": "جاري الحفظ…",
+    "save_button_loading": "جارٍ الحفظ…",
     "toast_saved": "تم الحفظ",
     "toast_deleted": "تم الحذف",
     "lost_dialog_title": "نقل إلى خسارة",
@@ -487,7 +492,7 @@
     "delete_dialog_title": "تأكيد الحذف",
     "delete_dialog_description": "هل أنت متأكد من حذف هذا العميل؟ لا يمكن التراجع.",
     "delete_confirm": "حذف",
-    "delete_loading": "جاري الحذف…",
+    "delete_loading": "جارٍ الحذف…",
     "delete_cancel": "إلغاء",
     "error_name_required": "الاسم مطلوب",
     "error_phone_required": "الهاتف مطلوب",
@@ -533,7 +538,7 @@
   },
 
   "property_detail_page": {
-    "page_title": "تفاصيل العقار | نِفال العقارية",
+    "page_title": "تفاصيل العقار | نفال العقارية",
     "not_found_title": "العقار غير موجود",
     "not_found_description": "ربما تم حذف هذا العقار أو لم يُنشر بعد.",
     "not_found_cta": "عرض جميع العقارات",
@@ -758,10 +763,10 @@
     "confirm": "تأكيد",
     "edit": "تعديل",
     "add": "إضافة",
-    "loading": "جاري التحميل…",
+    "loading": "جارٍ التحميل…",
     "no_data": "لا توجد بيانات",
     "error_occurred": "حدث خطأ",
-    "retry": "حاول مجدداً",
+    "retry": "حاول مجددًا",
     "yes": "نعم",
     "no": "لا"
   }

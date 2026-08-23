@@ -24,7 +24,7 @@ export function WhatsAppButton({
   onAction,
   className,
 }: WhatsAppButtonProps) {
-  const defaultMessage = `مرحباً${name ? " " + name + "،" : ""} أتواصل معك من منصة نِفال العقارية`;
+  const defaultMessage = `مرحباً${name ? " " + name + "،" : ""} أتواصل معك من منصة نفال العقارية`;
   const url = buildWhatsAppUrl(phone, message ?? defaultMessage);
 
   function handleClick() {

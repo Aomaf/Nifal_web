@@ -118,7 +118,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function FloatingWhatsApp() {
-  const waUrl = buildWhatsAppUrl(COMPANY_WHATSAPP, "السلام عليكم، أرغب بالاستفسار عن عقارات نِفال");
+  const waUrl = buildWhatsAppUrl(COMPANY_WHATSAPP, "السلام عليكم، أرغب بالاستفسار عن عقارات نفال");
   return (
     <a
       href={waUrl}

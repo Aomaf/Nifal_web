@@ -159,7 +159,7 @@ function Home() {
                 <a
                   href={buildWhatsAppUrl(
                     COMPANY_WHATSAPP,
-                    "السلام عليكم، أرغب بالاستفسار عن عقارات نِفال",
+                    "السلام عليكم، أرغب بالاستفسار عن عقارات نفال",
                   )}
                   target="_blank"
                   rel="noopener"
@@ -170,7 +170,7 @@ function Home() {
                     className="h-11 w-full rounded border-white/25 bg-transparent px-7 text-[13px] font-medium text-white transition hover:border-white/45 hover:bg-transparent sm:w-auto"
                   >
                     <MessageCircle className="ms-2 h-4 w-4" />
-                    تواصل واتساب
+                    راسلنا عبر واتساب
                   </Button>
                 </a>
               </div>
@@ -236,7 +236,7 @@ function Home() {
 
       <PropertySection
         title="عقارات موثوقة للسكن والاستثمار"
-        description="عقارات منتقاة من فريق نِفال، مرتبة بصورة واضحة حتى تقارن بين السعر، الموقع، والمساحة بسرعة."
+        description="مختارة بعناية من فريق نفال. سهولة المقارنة بين السعر والموقع والمساحة."
         properties={featured.rows as PropertyCardData[]}
       />
 
@@ -429,10 +429,10 @@ function RegaSearchCard() {
   return (
     <div className="rounded-md border border-border bg-background p-6 shadow-md">
       <h3 className="text-[17px] font-semibold leading-snug text-foreground text-right">
-        ابحث بمعرف الإعلان
+        ابحث برقم الإعلان
       </h3>
       <p className="mt-2 text-[13px] leading-[1.6] text-muted-foreground text-right">
-        أدخل رقم معرف الإعلان العقاري للوصول مباشرة إلى تفاصيل العقار.
+        أدخل رقم الإعلان العقاري للوصول مباشرة إلى تفاصيل العقار.
       </p>
       <form onSubmit={handleSearch} className="mt-4 space-y-2.5">
         <Input
@@ -455,7 +455,7 @@ function RegaSearchCard() {
         />
         {status === "not_found" && (
           <p className="text-[12px] text-destructive text-right">
-            لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.
+            لم يوجد عقار بهذا الرقم. تحقق من الرقم وحاول مجددًا.
           </p>
         )}
         {status === "error" && (
