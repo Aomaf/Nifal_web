@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useSuspenseQuery, queryOptions, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { getPublicProperty } from "@/lib/properties.functions";
+import { submitPropertyOffer } from "@/lib/leads.functions";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,9 @@ import {
   PURPOSE_LABELS,
   STATUS_LABELS,
   formatNumber,
+  buildMapEmbedUrl,
+  buildMapDirectionsUrl,
+  SALES_PHONE,
 } from "@/lib/format";
 import { ATTRIBUTE_FIELDS, TYPE_FIELDS, formatAttributeValue } from "@/lib/property-fields";
 import { SarAmount, SarIcon } from "@/components/ui/sar-icon";
@@ -50,7 +54,7 @@ export const Route = createFileRoute("/properties/$id")({
     if (!p) throw notFound();
   },
   head: ({ params }) => ({
-    meta: [{ title: `تفاصيل العقار | نِفال العقارية` }],
+    meta: [{ title: `تفاصيل العقار | نفال العقارية` }],
   }),
   component: PropertyDetail,
   notFoundComponent: () => (
@@ -77,6 +81,30 @@ export const Route = createFileRoute("/properties/$id")({
     </div>
   ),
 });
+
+// Handover date is stored as a plain YYYY-MM-DD date. Render it in Arabic
+// without going through the Date constructor's timezone shifting.
+function formatHandoverDate(value: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!m) return value;
+  const months = [
+    "يناير",
+    "فبراير",
+    "مارس",
+    "أبريل",
+    "مايو",
+    "يونيو",
+    "يوليو",
+    "أغسطس",
+    "سبتمبر",
+    "أكتوبر",
+    "نوفمبر",
+    "ديسمبر",
+  ];
+  const monthIndex = Number(m[2]) - 1;
+  const month = months[monthIndex] ?? m[2];
+  return `${Number(m[3])} ${month} ${m[1]}`;
+}
 
 function PropertyDetail() {
   const { id } = Route.useParams();
@@ -115,6 +143,18 @@ function PropertyDetail() {
 
   const isSale = data.purpose === "sale";
   const isAvailable = data.status === "available";
+
+  // Map: embed when we have coordinates, otherwise fall back to the raw
+  // pasted link (short goo.gl links can't be embedded without resolving).
+  const mapEmbedUrl =
+    data.location_lat != null && data.location_lng != null
+      ? buildMapEmbedUrl(Number(data.location_lat), Number(data.location_lng))
+      : null;
+  const mapDirectionsUrl = buildMapDirectionsUrl(
+    data.location_lat != null ? Number(data.location_lat) : null,
+    data.location_lng != null ? Number(data.location_lng) : null,
+    data.map_url,
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -234,7 +274,12 @@ function PropertyDetail() {
                 </span>
                 {data.rega_ad_code && (
                   <span className="rounded border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
-                    رقم REGA: {data.rega_ad_code}
+                    رقم الإعلان: {data.rega_ad_code}
+                  </span>
+                )}
+                {data.is_negotiable && (
+                  <span className="rounded border border-primary/30 bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary">
+                    قابل للتفاوض
                   </span>
                 )}
                 <span className="ms-auto flex items-center gap-1 text-[12px] text-muted-foreground">
@@ -273,6 +318,7 @@ function PropertyDetail() {
                     اتصل بنا
                   </Button>
                 </a>
+                <ShareButton title={data.title} />
               </div>
             </div>
 
@@ -321,6 +367,11 @@ function PropertyDetail() {
                   data.list_date && {
                     label: "تاريخ الإدراج",
                     value: data.list_date,
+                    icon: Calendar,
+                  },
+                  data.handover_date && {
+                    label: "تاريخ التسليم",
+                    value: formatHandoverDate(data.handover_date),
                     icon: Calendar,
                   },
                   data.sold_percentage != null && {
@@ -386,6 +437,56 @@ function PropertyDetail() {
                   {(data.owner as { name?: string }).name}
                 </p>
               </div>
+            )}
+
+            {/* Location map (item: خانة قوقل ماب) */}
+            {mapEmbedUrl && (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-[17px] font-semibold text-foreground">الموقع</h2>
+                  {mapDirectionsUrl && (
+                    <a
+                      href={mapDirectionsUrl}
+                      target="_blank"
+                      rel="noopener"
+                      className="flex items-center gap-1.5 text-[13px] font-medium text-primary hover:underline"
+                    >
+                      <MapPin className="h-3.5 w-3.5" />
+                      الاتجاهات على خرائط قوقل
+                    </a>
+                  )}
+                </div>
+                <div className="overflow-hidden rounded-lg border border-border">
+                  <iframe
+                    src={mapEmbedUrl}
+                    title="موقع العقار على الخريطة"
+                    className="h-[320px] w-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Map link only (short link — no coordinates to embed) */}
+            {!mapEmbedUrl && mapDirectionsUrl && (
+              <div className="space-y-3">
+                <h2 className="text-[17px] font-semibold text-foreground">الموقع</h2>
+                <a
+                  href={mapDirectionsUrl}
+                  target="_blank"
+                  rel="noopener"
+                  className="flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-4 text-[14px] font-medium text-primary transition hover:border-primary/40"
+                >
+                  <MapPin className="h-4 w-4 shrink-0" />
+                  عرض الموقع على خرائط قوقل
+                </a>
+              </div>
+            )}
+
+            {/* Make an offer (item: خيار مساومة) */}
+            {data.is_negotiable && (
+              <OfferForm propertyId={data.id} price={Number(data.price)} title={data.title} />
             )}
 
             {/* REGA disclaimer */}
@@ -459,19 +560,7 @@ function PropertyDetail() {
               </div>
 
               {/* Share */}
-              <button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({ title: data.title, url: window.location.href });
-                  } else {
-                    navigator.clipboard?.writeText(window.location.href);
-                  }
-                }}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-[13px] text-muted-foreground transition hover:border-primary/40 hover:text-primary"
-              >
-                <Share2 className="h-3.5 w-3.5" />
-                مشاركة العقار
-              </button>
+              <ShareButton title={data.title} />
             </div>
           </aside>
         </div>
@@ -531,5 +620,218 @@ function PropertyDetail() {
 
       <SiteFooter />
     </div>
+  );
+}
+
+// Price-offer form (item: خيار مساومة). Shown only on negotiable properties.
+// Submits a lead (source='offer') so the offer lands in the admin Leads screen,
+// then offers a WhatsApp follow-up for an immediate reply.
+function OfferForm({
+  propertyId,
+  price,
+  title,
+}: {
+  propertyId: string;
+  price: number;
+  title: string;
+}) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [amount, setAmount] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+
+  const submit = useMutation({
+    mutationFn: async () => {
+      const parsed = Number(amount.replace(/[,\s]/g, ""));
+      if (!Number.isFinite(parsed) || parsed <= 0) {
+        throw new Error("أدخل مبلغ العرض");
+      }
+      await submitPropertyOffer({
+        data: {
+          property_id: propertyId,
+          name: name.trim(),
+          phone: phone.trim(),
+          amount: parsed,
+          message: message.trim() || undefined,
+        },
+      });
+      return parsed;
+    },
+    onSuccess: () => {
+      setError(null);
+      setSent(true);
+    },
+    onError: (e: unknown) => {
+      setError(e instanceof Error ? e.message : "تعذر إرسال العرض، حاول مجدداً");
+    },
+  });
+
+  if (sent) {
+    const offerAmount = Number(amount.replace(/[,\s]/g, ""));
+    const waText = `السلام عليكم، قدمت عرضاً على العقار:\n${title}\nمبلغ العرض: ${formatNumber(offerAmount)} ريال`;
+    return (
+      <div className="rounded-lg border border-primary/25 bg-primary/5 p-5">
+        <div className="flex items-start gap-2.5">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-[15px] font-semibold text-foreground">تم إرسال عرضك</h2>
+              <p className="mt-1 text-[13px] text-muted-foreground">
+                سيتواصل معك فريق نفال لمناقشة العرض في أقرب وقت.
+              </p>
+            </div>
+            <a href={buildWhatsAppUrl(COMPANY_WHATSAPP, waText)} target="_blank" rel="noopener">
+              <Button variant="outline" className="h-10 gap-2">
+                <MessageCircle className="h-4 w-4" />
+                متابعة عبر واتساب
+              </Button>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-surface p-5">
+      <h2 className="text-[15px] font-semibold text-foreground">قدّم عرضك</h2>
+      <p className="mt-1 text-[13px] text-muted-foreground">
+        سعر هذا العقار قابل للتفاوض. أرسل المبلغ الذي ترغب به وسنعرضه على المالك.
+      </p>
+
+      <form
+        className="mt-4 space-y-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setError(null);
+          submit.mutate();
+        }}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label htmlFor="offer-name" className="text-[12px] text-muted-foreground">
+              الاسم
+            </label>
+            <input
+              id="offer-name"
+              required
+              minLength={2}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="h-11 w-full rounded-lg border border-border bg-background px-3 text-[14px] outline-none focus:border-primary/50"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="offer-phone" className="text-[12px] text-muted-foreground">
+              رقم الجوال
+            </label>
+            <input
+              id="offer-phone"
+              required
+              dir="ltr"
+              inputMode="tel"
+              placeholder="05XXXXXXXX"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="h-11 w-full rounded-lg border border-border bg-background px-3 text-[14px] outline-none focus:border-primary/50"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="offer-amount" className="text-[12px] text-muted-foreground">
+            مبلغ العرض (ريال) — السعر المعلن {formatNumber(price)}
+          </label>
+          <input
+            id="offer-amount"
+            required
+            dir="ltr"
+            inputMode="numeric"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="h-11 w-full rounded-lg border border-border bg-background px-3 text-[14px] outline-none focus:border-primary/50"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="offer-message" className="text-[12px] text-muted-foreground">
+            ملاحظة (اختياري)
+          </label>
+          <textarea
+            id="offer-message"
+            rows={2}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-[14px] outline-none focus:border-primary/50"
+          />
+        </div>
+
+        {error && (
+          <p className="rounded-md bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+            {error}
+          </p>
+        )}
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" disabled={submit.isPending} className="h-11 gap-2">
+            {submit.isPending ? "جارٍ الإرسال..." : "إرسال العرض"}
+          </Button>
+          <a
+            href={`tel:+966${SALES_PHONE.slice(1)}`}
+            className="text-[13px] text-muted-foreground hover:text-primary"
+          >
+            أو اتصل بقسم البيع
+          </a>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// Share control (item: خيار مشاركة). Used in both the desktop sidebar and the
+// mobile price card — the sidebar is `hidden lg:block`, so mobile needs its own.
+// Uses the native share sheet where available and falls back to copying the URL.
+function ShareButton({ title }: { title: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function share() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+        return;
+      } catch {
+        // User dismissed the sheet, or the browser refused — fall through to copy.
+      }
+    }
+    try {
+      await navigator.clipboard?.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard blocked (insecure context) — nothing useful left to try.
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={share}
+      className="flex w-full items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-[13px] text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+    >
+      {copied ? (
+        <>
+          <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+          تم نسخ الرابط
+        </>
+      ) : (
+        <>
+          <Share2 className="h-3.5 w-3.5" />
+          مشاركة العقار
+        </>
+      )}
+    </button>
   );
 }

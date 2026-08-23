@@ -113,7 +113,8 @@ function PropertiesPage() {
                     : "text-muted-foreground hover:text-foreground",
                 ].join(" ")}
               >
-                <Hash className="h-3.5 w-3.5" /># معرف الإعلان
+                <Hash className="h-3.5 w-3.5" />
+                رقم الإعلان
               </button>
             </div>
 
@@ -254,10 +255,12 @@ function PropertiesPage() {
 
         {data && data.rows.length === 0 && (
           <div className="mx-auto max-w-sm rounded-xl border border-border bg-surface px-8 py-16 text-center">
-            <div className="mb-4 text-4xl">🔍</div>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/8 text-primary">
+              <Search className="h-5 w-5" aria-hidden="true" />
+            </div>
             <h2 className="text-[22px] font-semibold text-foreground">لا توجد نتائج</h2>
             <p className="mt-2 text-[14px] leading-[1.7] text-muted-foreground">
-              جرّب توسيع نطاق البحث أو تغيير الفلاتر، أو أعد الضبط لعرض كل العقارات.
+              عدّل الفلاتر أو وسّع نطاق البحث.
             </p>
             <Button
               variant="outline"
@@ -346,14 +349,14 @@ function RegaSearchDark() {
             setCode(e.target.value);
             setNotFound(false);
           }}
-          placeholder="أدخل معرف الإعلان (مثال: 1234567890)"
+          placeholder="أدخل رقم الإعلان (مثال: 1234567890)"
           className="h-11 rounded-lg border-white/12 bg-white/8 ps-9 text-[13px] text-white shadow-none placeholder:text-white/35 placeholder:text-right focus-visible:border-white/30 focus-visible:ring-0"
           disabled={loading}
           autoComplete="off"
         />
         {notFound && (
           <p className="absolute top-full mt-1.5 text-[12px] text-red-400">
-            لم يوجد عقار بهذا المعرف. تحقق من الرقم وحاول مجدًدا.
+            لم يوجد عقار بهذا الرقم. تحقق من الرقم وحاول مجددًا.
           </p>
         )}
       </div>

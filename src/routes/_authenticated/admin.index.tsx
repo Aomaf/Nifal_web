@@ -106,7 +106,7 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="لوحة التحكم" subtitle="نظرة عامة على نشاط منصة نِفال العقارية" />
+      <PageHeader title="لوحة التحكم" subtitle="نظرة عامة على نشاط منصة نفال العقارية" />
 
       {noRoles && (
         <div className="card-elegant p-4 border-warning/40 bg-warning/5 flex items-start gap-3">

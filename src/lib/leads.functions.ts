@@ -75,3 +75,62 @@ export const convertLeadToClient = createServerFn({ method: "POST" })
       .eq("id", data.leadId);
     return { client };
   });
+
+// --- Public offer submission (خيار مساومة) ------------------------------
+// Unauthenticated: called from the public property page when a visitor
+// submits a price offer. Writes a lead with source='offer' so it lands in
+// the admin Leads screen. Uses supabaseAdmin because anon has no INSERT
+// policy on leads — the input is validated and the shape is fixed here,
+// so no visitor-controlled column can be set.
+const PublicOfferInput = z.object({
+  property_id: z.string().uuid(),
+  name: z.string().trim().min(2).max(200),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^0?5\d{8}$/, "رقم جوال سعودي غير صحيح"),
+  amount: z.number().positive().max(1_000_000_000),
+  message: z.string().trim().max(1000).optional(),
+});
+
+export const submitPropertyOffer = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => PublicOfferInput.parse(data))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Only accept offers on a published, non-archived, negotiable property.
+    const { data: property, error: pe } = await supabaseAdmin
+      .from("properties")
+      .select("id,title,price,is_negotiable,is_published,is_archived")
+      .eq("id", data.property_id)
+      .maybeSingle();
+    if (pe) throw new Error(pe.message);
+    if (!property || !property.is_published || property.is_archived) {
+      throw new Error("العقار غير متاح");
+    }
+    if (!property.is_negotiable) throw new Error("هذا العقار غير قابل للمساومة");
+
+    const offer = new Intl.NumberFormat("en-US").format(data.amount);
+    const asking = new Intl.NumberFormat("en-US").format(Number(property.price));
+    const notes = [
+      `عرض سعر: ${offer} ريال (السعر المعلن: ${asking} ريال)`,
+      `العقار: ${property.title}`,
+      data.message ? `ملاحظة العميل: ${data.message}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const phone = data.phone.startsWith("0") ? data.phone : `0${data.phone}`;
+
+    const { error } = await supabaseAdmin.from("leads").insert({
+      name: data.name,
+      phone,
+      property_id: data.property_id,
+      notes,
+      source: "offer",
+      status: "new",
+    } as never);
+    if (error) throw new Error(error.message);
+
+    return { ok: true };
+  });

@@ -7,7 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { buildWhatsAppUrl, COMPANY_WHATSAPP } from "@/lib/format";
+import {
+  buildWhatsAppUrl,
+  COMPANY_WHATSAPP,
+  SALES_PHONE,
+  RENTALS_PHONE,
+  formatPhone,
+} from "@/lib/format";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -15,7 +21,7 @@ export const Route = createFileRoute("/contact")({
       { title: "تواصل معنا | نفال العقارية" },
       {
         name: "description",
-        content: "تواصل مع فريق نِفال العقارية للاستفسار عن العقارات والخدمات.",
+        content: "تواصل مع فريق نفال العقارية للاستفسار عن العقارات والخدمات.",
       },
     ],
   }),
@@ -37,7 +43,7 @@ function ContactPage() {
         <div className="container mx-auto max-w-7xl px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">تواصل معنا</h1>
           <p className="text-primary-foreground/80">
-            أرسل استفسارك وسيتواصل معك فريق نِفال في أقرب وقت.
+            أرسل استفسارك وسيتواصل معك فريق نفال في أقرب وقت.
           </p>
         </div>
       </section>
@@ -45,8 +51,9 @@ function ContactPage() {
         <div className="card-elegant p-6 space-y-4">
           <h2 className="text-xl font-bold">معلومات التواصل</h2>
           {[
-            { icon: Phone, label: "الهاتف", value: "0550052120" },
-            { icon: MessageCircle, label: "واتساب", value: "+966 55 005 2120" },
+            { icon: Phone, label: "قسم البيع", value: SALES_PHONE },
+            { icon: Phone, label: "قسم الإيجار", value: RENTALS_PHONE },
+            { icon: MessageCircle, label: "واتساب", value: formatPhone(SALES_PHONE) },
             { icon: Mail, label: "البريد", value: "nafal.com.sa@gmail.com" },
             { icon: MapPin, label: "العنوان", value: "الرياض، المملكة العربية السعودية" },
             { icon: Clock, label: "ساعات العمل", value: "السبت - الخميس: 9 صباحاً - 9 مساءً" },
